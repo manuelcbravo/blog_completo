@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Config;
 use App\Enums\Rol;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Config\UpsertRoleRequest;
+use App\Http\Resources\Config\PermissionResource;
+use App\Http\Resources\Config\RoleResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,24 +23,14 @@ class RoleController extends Controller
         $busqueda = $request->string('busqueda')->trim()->toString();
 
         $roles = Role::query()
-            ->with('permissions:id,name,guard_name')
+            ->with('permissions')
             ->when($busqueda !== '', fn (Builder $query) => $query->whereLike('name', "%{$busqueda}%"))
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('config/roles/index', [
-            'roles' => $roles->getCollection()->map(fn (Role $rol): array => [
-                'id' => $rol->id,
-                'name' => $rol->name,
-                'guard_name' => $rol->guard_name,
-                'created_at' => $rol->created_at?->toISOString(),
-                'permissions' => $rol->permissions->map(fn (Permission $permiso): array => [
-                    'id' => $permiso->id,
-                    'name' => $permiso->name,
-                    'guard_name' => $permiso->guard_name,
-                ])->values(),
-            ])->values(),
+            'roles' => RoleResource::collection($roles->getCollection())->resolve(),
             'paginacion' => [
                 'total' => $roles->total(),
                 'currentPage' => $roles->currentPage(),
@@ -47,9 +39,9 @@ class RoleController extends Controller
                 'nextUrl' => $roles->nextPageUrl(),
                 'busqueda' => $busqueda,
             ],
-            'permissions' => Permission::query()
-                ->orderBy('name')
-                ->get(['id', 'name', 'guard_name']),
+            'permissions' => PermissionResource::collection(
+                Permission::query()->orderBy('name')->get(),
+            )->resolve(),
         ]);
     }
 

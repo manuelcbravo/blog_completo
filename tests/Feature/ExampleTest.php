@@ -1,7 +1,9 @@
 <?php
 
-test('returns a successful response', function () {
-    $response = $this->get(route('home'));
+test('la portada pública abre sin sesión', function () {
+    $this->get(route('home'))->assertOk();
+});
 
-    $response->assertOk();
+test('el panel sigue exigiendo sesión', function () {
+    $this->get(route('dashboard'))->assertRedirect(route('login'));
 });

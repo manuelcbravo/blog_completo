@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Config;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Config\UpsertUserRequest;
+use App\Http\Resources\Config\RoleResource;
+use App\Http\Resources\Config\UserResource;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +22,7 @@ class UserController extends Controller
         $esSuperAdmin = (bool) $request->user()?->es_super_admin;
 
         $usuarios = User::query()
-            ->with('roles:id,name')
+            ->with('roles')
             ->select(['id', 'name', 'email', 'es_super_admin', 'created_at'])
             // Los super admins solo son visibles (y gestionables) entre sí.
             ->when(! $esSuperAdmin, fn (Builder $query) => $query->where('es_super_admin', false))
@@ -34,17 +36,7 @@ class UserController extends Controller
             ->withQueryString();
 
         return Inertia::render('config/users/index', [
-            'users' => $usuarios->getCollection()->map(fn (User $usuario): array => [
-                'id' => $usuario->id,
-                'name' => $usuario->name,
-                'email' => $usuario->email,
-                'es_super_admin' => $usuario->es_super_admin,
-                'roles' => $usuario->roles->map(fn ($rol): array => [
-                    'id' => (int) $rol->getKey(),
-                    'name' => (string) $rol->getAttribute('name'),
-                ])->all(),
-                'created_at' => $usuario->created_at?->toISOString(),
-            ])->values(),
+            'users' => UserResource::collection($usuarios->getCollection())->resolve(),
             'paginacion' => [
                 'total' => $usuarios->total(),
                 'currentPage' => $usuarios->currentPage(),
@@ -53,7 +45,9 @@ class UserController extends Controller
                 'nextUrl' => $usuarios->nextPageUrl(),
                 'busqueda' => $busqueda,
             ],
-            'roles' => Role::query()->orderBy('name')->get(['id', 'name']),
+            'roles' => RoleResource::collection(
+                Role::query()->orderBy('name')->get(),
+            )->resolve(),
         ]);
     }
 

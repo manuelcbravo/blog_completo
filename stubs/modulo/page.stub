@@ -1,0 +1,279 @@
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { CrudFormDialog } from '@/components/crud-form-dialog';
+import { DataTable } from '@/components/data-table';
+import type { DataTableColumn, DataTableServer } from '@/components/data-table';
+import { FormInputField } from '@/components/form-input-field';
+import { FormSelectField } from '@/components/form-select-field';
+import { FormTextareaField } from '@/components/form-textarea-field';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { formatDate } from '@/lib/date';
+import { resolveFormErrorMessage } from '@/lib/form-error-message';
+import { destroy, index, store } from '@/routes/{{ rutaWayfinder }}';
+
+type {{ modelo }}Row = {
+    id: number;
+    nombre: string;
+    descripcion: string | null;
+    activo: boolean;
+    created_at: string;
+};
+
+type {{ modelo }}Form = {
+    id: number | null;
+    nombre: string;
+    descripcion: string;
+    activo: string;
+};
+
+const valoresIniciales: {{ modelo }}Form = {
+    id: null,
+    nombre: '',
+    descripcion: '',
+    activo: '1',
+};
+
+export default function {{ modelo }}Index({
+    {{ propPlural }},
+    paginacion,
+}: {
+    {{ propPlural }}: {{ modelo }}Row[];
+    paginacion: DataTableServer;
+}) {
+    const [activo, setActivo] = useState<{{ modelo }}Row | null>(null);
+    const [formMode, setFormMode] = useState<'create' | 'edit' | null>(null);
+    const form = useForm<{{ modelo }}Form>(valoresIniciales);
+    const { flash } = usePage().props;
+
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash?.error, flash?.success]);
+
+    const openCreateDialog = () => {
+        setActivo(null);
+        form.reset();
+        form.clearErrors();
+        setFormMode('create');
+    };
+
+    const openEditDialog = (registro: {{ modelo }}Row) => {
+        setActivo(registro);
+        form.clearErrors();
+        form.setData({
+            id: registro.id,
+            nombre: registro.nombre,
+            descripcion: registro.descripcion ?? '',
+            activo: registro.activo ? '1' : '0',
+        });
+        setFormMode('edit');
+    };
+
+    const closeFormDialog = (open: boolean) => {
+        if (!open) {
+            setFormMode(null);
+            setActivo(null);
+            form.clearErrors();
+        }
+    };
+
+    const submitForm = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        form.post(store.url(), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setFormMode(null);
+                setActivo(null);
+                form.reset();
+            },
+            onError: (errors) =>
+                toast.error(
+                    resolveFormErrorMessage(
+                        errors,
+                        'Verifica los campos marcados.',
+                    ),
+                ),
+        });
+    };
+
+    const columns: DataTableColumn<{{ modelo }}Row>[] = [
+        {
+            key: 'nombre',
+            header: 'Nombre',
+            accessor: (registro) => registro.nombre,
+            cell: (registro) => registro.nombre,
+        },
+        {
+            key: 'activo',
+            header: 'Estado',
+            cell: (registro) => (
+                <Badge variant={registro.activo ? 'secondary' : 'outline'}>
+                    {registro.activo ? 'Activo' : 'Inactivo'}
+                </Badge>
+            ),
+        },
+        {
+            key: 'created_at',
+            header: 'Creado',
+            cell: (registro) => formatDate(registro.created_at),
+        },
+        {
+            key: 'actions',
+            header: '',
+            className: 'w-14',
+            cell: (registro) => (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="size-8">
+                            <MoreHorizontal className="size-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                            onClick={() => openEditDialog(registro)}
+                        >
+                            <Pencil className="mr-2 size-4" /> Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => setActivo(registro)}
+                        >
+                            <Trash2 className="mr-2 size-4" /> Eliminar
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ),
+        },
+    ];
+
+    return (
+        <>
+            <Head title="{{ etiquetaPlural }}" />
+            <div className="space-y-4 rounded-xl p-4">
+                <div className="rounded-xl border border-sidebar-border/70 bg-sidebar-accent/20 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                        <div>
+                            <h1 className="text-xl font-semibold">
+                                {{ etiquetaPlural }}
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Administra los registros de {{ etiquetaPlural }}.
+                            </p>
+                        </div>
+                        <Button onClick={openCreateDialog}>
+                            <Plus className="mr-2 size-4" /> Nuevo
+                        </Button>
+                    </div>
+                </div>
+                <DataTable
+                    columns={columns}
+                    data={ {{ propPlural }} }
+                    server={paginacion}
+                    searchPlaceholder="Buscar por nombre..."
+                />
+            </div>
+
+            <CrudFormDialog
+                open={formMode !== null}
+                onOpenChange={closeFormDialog}
+                title={
+                    formMode === 'edit'
+                        ? 'Editar {{ etiquetaMinuscula }}'
+                        : 'Crear {{ etiquetaMinuscula }}'
+                }
+                description={
+                    formMode === 'edit'
+                        ? 'Actualiza los datos del registro seleccionado.'
+                        : 'Completa los datos del nuevo registro.'
+                }
+                submitLabel={
+                    formMode === 'edit' ? 'Guardar cambios' : 'Guardar'
+                }
+                processing={form.processing}
+                onSubmit={submitForm}
+            >
+                <FormInputField
+                    id="{{ recurso }}-nombre"
+                    label="Nombre"
+                    value={form.data.nombre}
+                    error={form.errors.nombre}
+                    onChange={(event) =>
+                        form.setData('nombre', event.target.value)
+                    }
+                    placeholder="Nombre del registro"
+                />
+
+                <FormTextareaField
+                    id="{{ recurso }}-descripcion"
+                    label="Descripción"
+                    value={form.data.descripcion}
+                    error={form.errors.descripcion}
+                    onChange={(event) =>
+                        form.setData('descripcion', event.target.value)
+                    }
+                    placeholder="Descripción opcional"
+                    rows={4}
+                />
+
+                <FormSelectField
+                    id="{{ recurso }}-activo"
+                    label="Estado"
+                    value={form.data.activo}
+                    error={form.errors.activo}
+                    onValueChange={(value) => form.setData('activo', value)}
+                    options={[
+                        { value: '1', label: 'Activo' },
+                        { value: '0', label: 'Inactivo' },
+                    ]}
+                />
+            </CrudFormDialog>
+
+            <ConfirmDeleteDialog
+                open={formMode === null && activo !== null}
+                onOpenChange={(open) => !open && setActivo(null)}
+                title="Eliminar {{ etiquetaMinuscula }}"
+                entityLabel="el registro"
+                itemName={activo?.nombre}
+                onConfirm={() => {
+                    if (!activo) {
+                        return;
+                    }
+
+                    router.delete(destroy.url(activo.id), {
+                        preserveScroll: true,
+                        onSuccess: () => setActivo(null),
+                        onError: (errors) =>
+                            toast.error(
+                                resolveFormErrorMessage(
+                                    errors,
+                                    'No se pudo eliminar el registro.',
+                                ),
+                            ),
+                    });
+                }}
+            />
+        </>
+    );
+}
+
+{{ modelo }}Index.layout = {
+    breadcrumbs: [{ title: '{{ etiquetaPlural }}', href: index() }],
+};

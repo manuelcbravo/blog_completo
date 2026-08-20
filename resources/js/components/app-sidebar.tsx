@@ -1,6 +1,18 @@
 import { Link } from '@inertiajs/react';
 import type { InertiaLinkProps } from '@inertiajs/react';
-import { ChevronRight, LayoutGrid, Settings } from 'lucide-react';
+import {
+    ChevronRight,
+    FolderTree,
+    GraduationCap,
+    Inbox,
+    LayoutGrid,
+    Mail,
+    MessageSquare,
+    Newspaper,
+    Package,
+    Settings,
+    Tags,
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavUser } from '@/components/nav-user';
@@ -26,23 +38,82 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import type { IsCurrentUrlFn } from '@/hooks/use-current-url';
 import { usePermisos } from '@/hooks/use-permisos';
 import { dashboard } from '@/routes';
+import { index as blogCategorias } from '@/routes/blog/categorias';
+import { index as blogComentarios } from '@/routes/blog/comentarios';
+import { index as blogContactos } from '@/routes/blog/contactos';
+import { index as blogEtiquetas } from '@/routes/blog/etiquetas';
+import { index as blogPublicaciones } from '@/routes/blog/publicaciones';
+import { index as blogSuscriptores } from '@/routes/blog/suscriptores';
 import { index as configRoles } from '@/routes/config/roles';
 import { index as configUsers } from '@/routes/config/users';
 
 type Href = NonNullable<InertiaLinkProps['href']>;
-type Enlace = { title: string; href: Href };
+type Enlace = { title: string; href: Href; icon: LucideIcon };
 type Grupo = {
     title: string;
     icon: LucideIcon;
-    visible: boolean;
-    items: Enlace[];
+    items: { title: string; href: Href }[];
 };
 
 export function AppSidebar() {
     const { puede } = usePermisos();
     const { isCurrentUrl } = useCurrentUrl();
 
-    const configuracionItems: Enlace[] = [
+    const enlaces: Enlace[] = [
+        { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+        ...(puede('blog.publicaciones.gestionar')
+            ? [
+                  {
+                      title: 'Publicaciones',
+                      href: blogPublicaciones('posts'),
+                      icon: Newspaper,
+                  },
+                  {
+                      title: 'Tutoriales',
+                      href: blogPublicaciones('tutoriales'),
+                      icon: GraduationCap,
+                  },
+                  {
+                      title: 'Recursos',
+                      href: blogPublicaciones('recursos'),
+                      icon: Package,
+                  },
+              ]
+            : []),
+        ...(puede('blog.taxonomias.gestionar')
+            ? [
+                  {
+                      title: 'Categorías',
+                      href: blogCategorias(),
+                      icon: FolderTree,
+                  },
+                  { title: 'Etiquetas', href: blogEtiquetas(), icon: Tags },
+              ]
+            : []),
+        ...(puede('blog.comentarios.moderar')
+            ? [
+                  {
+                      title: 'Comentarios',
+                      href: blogComentarios(),
+                      icon: MessageSquare,
+                  },
+              ]
+            : []),
+        ...(puede('blog.suscriptores.gestionar')
+            ? [
+                  {
+                      title: 'Suscriptores',
+                      href: blogSuscriptores(),
+                      icon: Mail,
+                  },
+              ]
+            : []),
+        ...(puede('blog.contactos.gestionar')
+            ? [{ title: 'Mensajes', href: blogContactos(), icon: Inbox }]
+            : []),
+    ];
+
+    const configuracionItems = [
         ...(puede('usuarios.gestionar')
             ? [
                   { title: 'Usuarios', href: configUsers() },
@@ -68,18 +139,20 @@ export function AppSidebar() {
             <SidebarContent>
                 <SidebarGroup className="px-2 py-0">
                     <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                asChild
-                                isActive={isCurrentUrl(dashboard())}
-                                tooltip={{ children: 'Dashboard' }}
-                            >
-                                <Link href={dashboard()} prefetch>
-                                    <LayoutGrid />
-                                    <span>Dashboard</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
+                        {enlaces.map((enlace) => (
+                            <SidebarMenuItem key={enlace.title}>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isCurrentUrl(enlace.href)}
+                                    tooltip={{ children: enlace.title }}
+                                >
+                                    <Link href={enlace.href} prefetch>
+                                        <enlace.icon />
+                                        <span>{enlace.title}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
@@ -91,7 +164,6 @@ export function AppSidebar() {
                             grupo={{
                                 title: 'Configuración',
                                 icon: Settings,
-                                visible: true,
                                 items: configuracionItems,
                             }}
                             isCurrentUrl={isCurrentUrl}

@@ -2,18 +2,10 @@
 
 namespace App\Enums;
 
-/**
- * Roles de la plataforma (spatie/permission, roles globales).
- *
- * El super admin NO es un rol: es el flag booleano users.es_super_admin
- * resuelto vía Gate::before (acceso total).
- *
- * Base genérica: define aquí los roles de tu aplicación y los permisos
- * que agrupa cada uno; el RoleSeeder los sincroniza.
- */
 enum Rol: string
 {
     case Administrador = 'administrador';
+    case Editor = 'editor';
 
     /**
      * @return list<Permiso>
@@ -21,8 +13,12 @@ enum Rol: string
     public function permisos(): array
     {
         return match ($this) {
-            self::Administrador => [
-                Permiso::UsuariosGestionar,
+            self::Administrador => Permiso::cases(),
+            self::Editor => [
+                Permiso::BlogPublicacionesGestionar,
+                Permiso::BlogTaxonomiasGestionar,
+                Permiso::BlogComentariosModerar,
+                Permiso::BlogAnaliticaVer,
             ],
         };
     }
@@ -31,6 +27,7 @@ enum Rol: string
     {
         return match ($this) {
             self::Administrador => 'Administrador',
+            self::Editor => 'Editor',
         };
     }
 }

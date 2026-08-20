@@ -171,12 +171,17 @@ export default function UsersIndex({
             cell: (row) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="size-8">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                            aria-label="Abrir acciones"
+                        >
                             <MoreHorizontal className="size-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => openEditDialog(row)}>
+                        <DropdownMenuItem onSelect={() => openEditDialog(row)}>
                             <Pencil className="mr-2 size-4" /> Editar
                         </DropdownMenuItem>
                         {row.id !== auth.user.id && (
@@ -184,7 +189,7 @@ export default function UsersIndex({
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     variant="destructive"
-                                    onClick={() => setActiveUser(row)}
+                                    onSelect={() => setActiveUser(row)}
                                 >
                                     <Trash2 className="mr-2 size-4" /> Eliminar
                                 </DropdownMenuItem>
@@ -201,7 +206,7 @@ export default function UsersIndex({
             <Head title="Usuarios" />
             <div className="space-y-4 rounded-xl p-4">
                 <div className="rounded-xl border border-sidebar-border/70 bg-sidebar-accent/20 p-4">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                             <Users className="size-5 text-primary" />
                             <div>

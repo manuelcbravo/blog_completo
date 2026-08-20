@@ -1,0 +1,673 @@
+/* Página del autor: la ficha profesional de /manuel. */
+
+.icono {
+    display: inline-flex;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* Encabezado de sección: barra de acento + titular grande, para que la
+   sección se vea de un vistazo y no se pierda entre el texto. */
+.titulo-seccion {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0;
+    padding-left: 16px;
+    border-left: 4px solid var(--accent);
+    font-size: clamp(26px, 3.2vw, 36px);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.titulo-seccion::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+}
+
+.titulo-seccion--menor {
+    font-size: clamp(20px, 2.2vw, 24px);
+    border-left-width: 3px;
+    padding-left: 12px;
+}
+
+.perfil {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: clamp(28px, 4vw, 64px);
+    padding: clamp(36px, 5vw, 72px) 0 clamp(32px, 4vw, 56px);
+    border-bottom: 1px solid var(--line);
+}
+
+/* Retrato: la foto es 2:3, así que un marco cuadrado la recortaba por arriba
+   y le cortaba la cabeza. El marco es vertical (4:5) y el encuadre se ancla
+   cerca del borde superior, de modo que lo que sobra se quita de los pies. */
+.imagen-marco--retrato img,
+.marcador--retrato {
+    aspect-ratio: 4 / 5;
+}
+
+.imagen-marco--retrato img {
+    object-position: 50% 12%;
+}
+
+.perfil__cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+}
+
+.perfil__nombre {
+    font-size: clamp(42px, 5.6vw, 72px);
+    line-height: 0.98;
+}
+
+.perfil__titular {
+    margin: 0;
+    max-width: 44ch;
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--fg);
+    text-wrap: pretty;
+}
+
+.perfil__resumen {
+    margin: 0;
+    max-width: 66ch;
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: var(--fg2);
+}
+
+.disponible {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 14px 0 0;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.disponible__punto {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+.ficha {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin: 6px 0 0;
+    background: var(--line);
+    border: 1px solid var(--line);
+}
+
+.ficha > div {
+    background: var(--panel);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ficha dt {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fg3);
+}
+
+.ficha dd {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+}
+
+.perfil__acciones {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-top: 6px;
+}
+
+.boton--icono {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    font-size: 14px;
+}
+
+.enlaces {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+}
+
+.enlaces a {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid var(--accent-dim);
+    padding: 13px 18px;
+    color: var(--fg);
+    background: var(--panel);
+    font-size: 14px;
+    transition:
+        background 140ms ease,
+        color 140ms ease;
+}
+
+.enlaces .icono {
+    font-size: 17px;
+    color: var(--accent);
+}
+
+.enlaces a:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+}
+
+.enlaces a:hover .icono {
+    color: var(--on-accent);
+}
+
+/* Teléfono con menú: en el móvil la decisión real es llamar o escribir por
+   WhatsApp, así que el botón la pregunta en vez de suponerla. Va con <details>
+   para que abra y cierre sin JavaScript; el script sólo lo cierra al pulsar
+   fuera o con Escape. Las reglas se prefijan con .enlaces para ganarle a los
+   estilos genéricos de los botones hermanos. */
+.enlaces .menu-tel {
+    position: relative;
+}
+
+.enlaces .menu-tel > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid var(--accent-dim);
+    padding: 13px 18px;
+    background: var(--panel);
+    color: var(--fg);
+    font-size: 14px;
+    cursor: pointer;
+    list-style: none;
+    transition:
+        background 140ms ease,
+        color 140ms ease;
+}
+
+.enlaces .menu-tel > summary::-webkit-details-marker {
+    display: none;
+}
+
+.enlaces .menu-tel > summary:hover,
+.enlaces .menu-tel[open] > summary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+}
+
+.enlaces .menu-tel > summary:hover .icono,
+.enlaces .menu-tel[open] > summary .icono {
+    color: var(--on-accent);
+}
+
+.enlaces .menu-tel__flecha {
+    font-size: 12px;
+    transition: transform 140ms ease;
+}
+
+.enlaces .menu-tel[open] .menu-tel__flecha {
+    transform: rotate(180deg);
+}
+
+.enlaces .menu-tel__panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    min-width: 100%;
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--accent-dim);
+    background: var(--panel);
+    box-shadow: 0 14px 34px rgb(0 0 0 / 0.35);
+}
+
+.enlaces .menu-tel__panel a {
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 12px 16px;
+    background: transparent;
+    white-space: nowrap;
+}
+
+.enlaces .menu-tel__panel a:last-child {
+    border-bottom: 0;
+}
+
+.bloque {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: clamp(36px, 5vw, 60px) 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.bloque--final {
+    border-bottom: none;
+}
+
+.bloque__intro {
+    margin: 0;
+    max-width: 60ch;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--fg2);
+}
+
+.bloque__intro strong {
+    color: var(--fg);
+    font-weight: 600;
+}
+
+/* Proyectos: la prueba de trabajo, en tarjetas con superficie propia. */
+.proyectos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+}
+
+.proyecto {
+    display: flex;
+    gap: 16px;
+    background: var(--bg);
+    padding: 26px 24px 28px;
+    transition: background 140ms ease;
+}
+
+.proyecto:hover {
+    background: var(--panel);
+}
+
+.proyecto__indice {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    padding-top: 4px;
+}
+
+.proyecto__cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.proyecto h3 {
+    font-size: 24px;
+    letter-spacing: -0.02em;
+}
+
+.proyecto p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--fg2);
+}
+
+.pildora--acento {
+    border-color: var(--accent-dim) !important;
+    color: var(--accent) !important;
+    background: color-mix(in oklab, var(--accent) 8%, transparent);
+}
+
+.pildoras--mini {
+    font-size: 11.5px;
+}
+
+.pildoras--mini span {
+    padding: 4px 9px;
+}
+
+.log {
+    display: flex;
+    flex-direction: column;
+}
+
+.log__entrada {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: clamp(16px, 3vw, 40px);
+    padding: 26px 0;
+    border-top: 1px solid var(--line);
+}
+
+.log__entrada:last-child {
+    border-bottom: 1px solid var(--line);
+}
+
+.log__rail {
+    display: flex;
+    align-self: start;
+    align-content: flex-start;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg3);
+}
+
+.log__punto {
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--line2);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transform: translateY(-1px);
+}
+
+.log__entrada--actual .log__punto {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+.log__marca {
+    border: 1px solid var(--accent-dim);
+    color: var(--accent);
+    padding: 2px 7px;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.log__cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.log__cuerpo h3 {
+    font-size: 23px;
+    letter-spacing: -0.02em;
+}
+
+.log__entrada--actual .log__cuerpo h3 {
+    font-size: 28px;
+}
+
+.log__cuerpo p {
+    margin: 0;
+    max-width: 68ch;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--fg2);
+}
+
+.logros {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    max-width: 72ch;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg2);
+}
+
+.logros li::marker {
+    color: var(--accent-dim);
+}
+
+.aptitudes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+}
+
+.aptitud {
+    background: var(--bg);
+    padding: 22px 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: background 140ms ease;
+}
+
+.aptitud:hover {
+    background: var(--panel);
+}
+
+.aptitud__grupo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+}
+
+.aptitud__icono {
+    font-size: 19px;
+    color: var(--accent);
+}
+
+.credenciales {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 4vw, 48px);
+}
+
+.credenciales > div {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tarjeta-plana {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 18px 20px;
+}
+
+.tarjeta-plana h3 {
+    font-size: 17px;
+    letter-spacing: -0.01em;
+}
+
+.tarjeta-plana p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--fg2);
+}
+
+.tarjeta-plana--check {
+    flex-direction: row;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.tarjeta-plana--check > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tarjeta-plana__icono {
+    font-size: 18px;
+    color: var(--accent);
+    margin-top: 2px;
+}
+
+.contacto {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+}
+
+.contacto > div {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contacto__titulo {
+    font-size: clamp(30px, 3.6vw, 44px);
+    letter-spacing: -0.02em;
+}
+
+.contacto__texto {
+    margin: 0;
+    max-width: 42ch;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--fg2);
+}
+
+.datos-contacto {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--fg2);
+}
+
+.datos-contacto li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.datos-contacto .icono {
+    font-size: 16px;
+    color: var(--accent);
+}
+
+.formulario--panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 24px;
+}
+
+.formulario--panel .campo {
+    background: var(--bg);
+}
+
+@media (max-width: 900px) {
+    .perfil__retrato {
+        max-width: 280px;
+    }
+
+    .perfil,
+    .credenciales,
+    .contacto,
+    .proyectos,
+    .aptitudes {
+        grid-template-columns: 1fr;
+    }
+
+    .ficha {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .log__entrada {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .log__entrada--actual .log__cuerpo h3 {
+        font-size: 24px;
+    }
+}
+
+/* Tecnologías con icono: los logotipos son máscaras, así que toman el color
+   del tema; los conceptos usan un glifo de Bootstrap Icons. */
+.tecnologias {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tecnologia {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 6px 11px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg2);
+}
+
+.tecnologia--destacada {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+}
+
+.tecnologia--acento {
+    border-color: rgba(249, 115, 22, 0.5);
+    color: #f97316;
+}
+
+.tecnologia--acento .tecnologia__glifo {
+    color: #f97316;
+}
+
+.tecnologia__marca {
+    width: 15px;
+    height: 15px;
+    background: currentColor;
+    mask: var(--marca) center / contain no-repeat;
+    -webkit-mask: var(--marca) center / contain no-repeat;
+    flex-shrink: 0;
+}
+
+.tecnologia__glifo {
+    font-size: 14px;
+    line-height: 1;
+    color: var(--fg3);
+}
+
+.tecnologia--destacada .tecnologia__glifo {
+    color: var(--accent);
+}

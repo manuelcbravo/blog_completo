@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\{{ modelo }}Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class {{ modelo }} extends Model
+{
+    /** @use HasFactory<{{ modelo }}Factory> */
+    use HasFactory;
+
+    /**
+     * @var list<string>
+     */
+    protected $fillable = [
+        'nombre',
+        'descripcion',
+        'activo',
+    ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'activo' => 'boolean',
+        ];
+    }
+}

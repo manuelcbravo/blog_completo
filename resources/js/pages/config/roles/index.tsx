@@ -176,18 +176,23 @@ export default function RolesIndex({
             cell: (role) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="size-8">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                            aria-label="Abrir acciones"
+                        >
                             <MoreHorizontal className="size-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => openEditDialog(role)}>
+                        <DropdownMenuItem onSelect={() => openEditDialog(role)}>
                             <Pencil className="mr-2 size-4" /> Editar
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             variant="destructive"
-                            onClick={() => setActiveRole(role)}
+                            onSelect={() => setActiveRole(role)}
                         >
                             <Trash2 className="mr-2 size-4" /> Eliminar
                         </DropdownMenuItem>
@@ -202,7 +207,7 @@ export default function RolesIndex({
             <Head title="Roles y permisos" />
             <div className="space-y-4 rounded-xl p-4">
                 <div className="rounded-xl border border-sidebar-border/70 bg-sidebar-accent/20 p-4">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                             <ShieldCheck className="size-5 text-primary" />
                             <div>

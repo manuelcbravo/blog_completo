@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Post;
+use App\Models\Recurso;
+use App\Models\Tutorial;
 use App\Models\User;
+use App\Observers\PublicacionObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
 
         // El super admin tiene acceso total sin necesidad de roles/permisos.
         Gate::before(fn (User $user) => $user->es_super_admin ? true : null);
+
+        Post::observe(PublicacionObserver::class);
+        Tutorial::observe(PublicacionObserver::class);
+        Recurso::observe(PublicacionObserver::class);
     }
 
     /**

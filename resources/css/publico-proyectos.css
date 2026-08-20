@@ -1,0 +1,182 @@
+/* =========================================================================
+   Página /proyectos — vitrina técnica de lo que corre en el servidor.
+   Reutiliza los tokens del tema y el componente .tecnologia para los stacks.
+   ========================================================================= */
+
+.proyectos-intro {
+    max-width: 68ch;
+}
+
+.proyectos-intro__kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    margin: 0 0 10px;
+}
+
+.proyectos-intro__titulo {
+    font-family: var(--sans);
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.1;
+    margin: 0 0 16px;
+    color: var(--fg);
+}
+
+.proyectos-intro__texto {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--fg2);
+    margin: 0 0 18px;
+}
+
+.proyectos-intro__nota {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg3);
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    margin: 0;
+}
+
+/* --- Cabecera de cada grupo --- */
+.proyectos-grupo {
+    margin-bottom: 20px;
+}
+
+.proyectos-grupo__resumen {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fg3);
+    margin: 10px 0 0;
+    max-width: 70ch;
+}
+
+/* --- Rejilla de tarjetas --- */
+.proyectos-lista {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 760px) {
+    .proyectos-lista {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- Tarjeta de proyecto --- */
+.proyecto {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 20px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.proyecto:hover {
+    border-color: var(--line2);
+    transform: translateY(-2px);
+}
+
+.proyecto--acento {
+    border-color: rgba(249, 115, 22, 0.45);
+    box-shadow: inset 3px 0 0 #f97316;
+}
+
+.proyecto--acento:hover {
+    border-color: rgba(249, 115, 22, 0.7);
+}
+
+.proyecto__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.proyecto__nombre {
+    font-family: var(--sans);
+    font-size: 18px;
+    line-height: 1.2;
+    margin: 0 0 4px;
+    color: var(--fg);
+}
+
+.proyecto__tipo {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg3);
+    margin: 0;
+}
+
+.proyecto__enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    padding: 4px 9px;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.proyecto__enlace:hover {
+    border-color: var(--accent-dim);
+}
+
+.proyecto__enlace--privado {
+    color: var(--fg3);
+    cursor: default;
+}
+
+.proyecto__resumen {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fg2);
+    margin: 0;
+}
+
+.proyecto__detalles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.proyecto__detalles li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--fg2);
+}
+
+.proyecto__detalles li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    transform: rotate(45deg);
+}
+
+.proyecto--acento .proyecto__detalles li::before {
+    background: #f97316;
+}
+
+.proyecto__stack {
+    margin-top: 4px;
+}

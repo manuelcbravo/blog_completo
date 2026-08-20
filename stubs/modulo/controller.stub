@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Http\Controllers{{ namespaceGrupo }};
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests{{ namespaceGrupo }}\Upsert{{ modelo }}Request;
+use App\Http\Resources{{ namespaceGrupo }}\{{ modelo }}Resource;
+use App\Models\{{ modelo }};
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class {{ modelo }}Controller extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $busqueda = $request->string('busqueda')->trim()->toString();
+
+        ${{ variablePlural }} = {{ modelo }}::query()
+            ->when($busqueda !== '', fn (Builder $query) => $query->whereLike('nombre', "%{$busqueda}%"))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('{{ rutaPagina }}', [
+            '{{ propPlural }}' => {{ modelo }}Resource::collection(${{ variablePlural }}->getCollection())->resolve(),
+            'paginacion' => [
+                'total' => ${{ variablePlural }}->total(),
+                'currentPage' => ${{ variablePlural }}->currentPage(),
+                'lastPage' => ${{ variablePlural }}->lastPage(),
+                'prevUrl' => ${{ variablePlural }}->previousPageUrl(),
+                'nextUrl' => ${{ variablePlural }}->nextPageUrl(),
+                'busqueda' => $busqueda,
+            ],
+        ]);
+    }
+
+    /**
+     * Crea o actualiza segun venga el id en la peticion.
+     */
+    public function store(Upsert{{ modelo }}Request $request): RedirectResponse
+    {
+        $data = $request->validated();
+        $esEdicion = isset($data['id']);
+
+        ${{ variable }} = $esEdicion
+            ? {{ modelo }}::query()->findOrFail((int) $data['id'])
+            : new {{ modelo }};
+
+        ${{ variable }}->fill(collect($data)->except('id')->all());
+        ${{ variable }}->save();
+
+        return back()->with('success', $esEdicion
+            ? '{{ etiqueta }} actualizado correctamente.'
+            : '{{ etiqueta }} creado correctamente.');
+    }
+
+    public function destroy({{ modelo }} ${{ variable }}): RedirectResponse
+    {
+        ${{ variable }}->delete();
+
+        return back()->with('success', '{{ etiqueta }} eliminado correctamente.');
+    }
+}
