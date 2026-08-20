@@ -24,7 +24,12 @@ class AnaliticaController extends Controller
 
     public function index(Request $request): Response
     {
-        if ($request->user()?->cannot('blog.analitica.ver')) {
+        // Sin usuario o sin permiso, el tablero se arma vacío. La comprobación
+        // es explícita a propósito: con ?-> un invitado obtenía null, que es
+        // falsy, y habría pasado de largo si algún día la ruta pierde 'auth'.
+        $usuario = $request->user();
+
+        if ($usuario === null || $usuario->cannot('blog.analitica.ver')) {
             return Inertia::render('dashboard', ['analitica' => null]);
         }
 

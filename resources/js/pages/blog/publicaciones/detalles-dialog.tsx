@@ -100,6 +100,7 @@ export function DialogoDetalles({
                         ref={inputArchivo}
                         id="detalle-archivo"
                         type="file"
+                        accept=".pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.png,.jpg,.jpeg,.webp,.gif"
                         className="w-full rounded-md border border-input px-3 py-1.5 text-sm file:mr-3 file:rounded file:border-0 file:bg-primary file:px-3 file:py-1 file:text-primary-foreground"
                         onChange={(event) =>
                             form.setData(

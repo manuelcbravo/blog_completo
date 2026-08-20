@@ -14,7 +14,15 @@ class UpsertDetalleRequest extends FormRequest
     {
         return [
             'detalle' => ['required', 'string', 'max:255'],
-            'archivo' => ['required', 'file', 'max:20480'],
+            'archivo' => [
+                'required',
+                'file',
+                'max:20480',
+                // Se sirven desde el disco público con su URL directa, así que
+                // no se aceptan tipos que el navegador ejecute: html, svg o js
+                // subidos aquí correrían como página en el dominio de archivos.
+                'mimes:pdf,zip,doc,docx,xls,xlsx,ppt,pptx,csv,txt,png,jpg,jpeg,webp,gif',
+            ],
             'orden' => ['nullable', 'integer', 'min:0'],
         ];
     }
@@ -28,6 +36,7 @@ class UpsertDetalleRequest extends FormRequest
             'detalle.required' => 'Describe el recurso.',
             'archivo.required' => 'Adjunta el archivo del recurso.',
             'archivo.max' => 'El archivo no debe pesar más de 20 MB.',
+            'archivo.mimes' => 'Formato no permitido. Se aceptan documentos, hojas de cálculo, comprimidos e imágenes.',
         ];
     }
 }
