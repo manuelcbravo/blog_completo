@@ -11,10 +11,16 @@ use Spatie\Permission\Models\Permission;
 
 function editorDePublicaciones(): User
 {
-    Permission::findOrCreate(Permiso::BlogPublicacionesGestionar->value);
+    foreach ([Permiso::BlogPublicacionesVer, Permiso::BlogPublicacionesGestionar, Permiso::BlogPublicacionesPublicar] as $permiso) {
+        Permission::findOrCreate($permiso->value);
+    }
 
     $usuario = User::factory()->create();
-    $usuario->givePermissionTo(Permiso::BlogPublicacionesGestionar->value);
+    $usuario->givePermissionTo([
+        Permiso::BlogPublicacionesVer->value,
+        Permiso::BlogPublicacionesGestionar->value,
+        Permiso::BlogPublicacionesPublicar->value,
+    ]);
 
     return $usuario;
 }

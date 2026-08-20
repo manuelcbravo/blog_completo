@@ -64,7 +64,10 @@ class AnaliticaController extends Controller
         return [
             'publicadas' => $publicadas,
             'borradores' => $borradores,
-            'vistas' => Vista::query()->where('created_at', '>=', $desde)->count(),
+            'vistas' => Vista::query()
+                ->whereIn('tipo', array_column(TipoPublicacion::cases(), 'value'))
+                ->where('created_at', '>=', $desde)
+                ->count(),
             'suscriptores' => Suscriptor::query()->confirmados()->count(),
             'suscriptoresNuevos' => Suscriptor::query()->where('created_at', '>=', $desde)->count(),
             'comentariosPendientes' => Comentario::query()
@@ -117,7 +120,7 @@ class AnaliticaController extends Controller
             $delDia = $conteos->get($fecha);
 
             $porTipo = static fn (TipoPublicacion $tipo): int => (int) (
-                $delDia?->firstWhere('tipo', $tipo)?->getAttribute('total') ?? 0
+                $delDia?->firstWhere('tipo', $tipo->value)?->getAttribute('total') ?? 0
             );
 
             $post = $porTipo(TipoPublicacion::Post);

@@ -7,13 +7,19 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use RuntimeException;
 
+/**
+ * Deja la plataforma lista de punta a punta: permisos, roles, el super
+ * administrador, la cuenta de demostración y el contenido real del blog.
+ *
+ *     php artisan db:seed
+ *
+ * Es idempotente. El contenido sale de redaccion/borradores, así que sembrar
+ * dos veces actualiza lo que cambió en vez de duplicarlo.
+ */
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         $this->call(RoleSeeder::class);
@@ -26,6 +32,9 @@ class DatabaseSeeder extends Seeder
             ]);
 
         $admin->forceFill(['es_super_admin' => true])->save();
+
+        $this->call(UsuarioDemoSeeder::class);
+        $this->call(BlogContenidoSeeder::class);
     }
 
     /**

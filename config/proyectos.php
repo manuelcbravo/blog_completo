@@ -15,6 +15,27 @@
 |
 */
 
+/*
+ * Cuenta de demostración. Es la misma en POS, Atlas Electoral y Territorio, a
+ * propósito: quien venga a ver el trabajo teclea una sola credencial.
+ *
+ * Se muestra en la página, pero los valores viven en el `.env` y no en este
+ * archivo, que sí va a git: una cosa es enseñarla en la vitrina y otra dejarla
+ * en el historial del repositorio para siempre.
+ *
+ * Está pensada para publicarse, así que el rol `demo` de cada plataforma va
+ * recortado: en POS y Electoral solo puede consultar, y en ninguna de las tres
+ * llega a la administración de usuarios ni a la configuración. Si eso cambia en
+ * el servidor, hay que revisar lo que dice aquí.
+ *
+ * Es temporal, mientras la vitrina esté arriba. Para apagar el bloque en las
+ * tres tarjetas de un solo movimiento, basta vaciar `DEMO_ACCESO_CLAVE`.
+ */
+$demo = [
+    'usuario' => env('DEMO_ACCESO_USUARIO'),
+    'clave' => env('DEMO_ACCESO_CLAVE'),
+];
+
 return [
 
     'titulo' => 'Proyectos en producción',
@@ -22,6 +43,13 @@ return [
     'intro' => 'Todo esto corre en un solo VPS (AlmaLinux 9) con cerca de 25 contenedores Docker. Cada aplicación y su base de datos viven en su propio stack de docker compose, publicados solo en loopback y expuestos a internet por un reverse proxy nginx con certificado TLS por subdominio. Los paneles internos se alcanzan por una red privada Tailscale, sin abrir puertos extra.',
 
     'nota' => 'Ficha técnica de arquitectura y stack. Se omiten a propósito credenciales, tokens, IPs internas y puertos.',
+
+    /*
+     * Cuántos puntos de "detalles" se ven sin desplegar. El resto se guarda en
+     * un acordeón. Si lo que quedaría escondido es un solo punto, no se parte:
+     * no vale la pena un "ver más" para una línea.
+     */
+    'detalles_visibles' => 3,
 
     'grupos' => [
 
@@ -35,6 +63,7 @@ return [
                     'nombre' => 'POS / ERP',
                     'url' => 'https://pos.laravelconmanuel.dev',
                     'tipo' => 'Punto de venta, ERP y facturación electrónica',
+                    'acceso' => $demo + ['nota' => 'Cuenta de solo lectura: recorre los módulos, no modifica nada.'],
                     'resumen' => 'Sistema comercial completo sobre Laravel 12 con Inertia y React: venta de mostrador, inventario, compras, producción, cobranza y facturación CFDI 4.0 timbrada ante el SAT. Además hace de backend para el bot de pedidos.',
                     'detalles' => [
                         'Facturación electrónica CFDI 4.0: timbrado y cancelación contra un PAC, factura global de los tickets del periodo, autofacturación pública para que el cliente facture su ticket, catálogos oficiales del SAT (uso de CFDI, régimen fiscal, forma de pago, claves de unidad y de servicio), validación fiscal del receptor, PDF de la factura y envío por correo.',
@@ -58,6 +87,7 @@ return [
                     'nombre' => 'Atlas Electoral',
                     'url' => 'https://electoral.laravelconmanuel.dev',
                     'tipo' => 'SaaS de inteligencia electoral geoespacial',
+                    'acceso' => $demo + ['nota' => 'Acceso completo a los módulos —tableros, mapas, panorama, gestión, directorio y catálogos—, salvo la administración de usuarios.'],
                     'resumen' => 'Ingesta y análisis territorial de reportes de campo; cruza la información con capas geográficas usando PostGIS y la pinta sobre mapas vectoriales. Recibe gestiones en tiempo real desde el bot de WhatsApp "pipe".',
                     'detalles' => [
                         'Laravel 13 con Inertia + React 19 y Vite; TypeScript en el front.',
@@ -78,6 +108,7 @@ return [
                     'nombre' => 'Territorio',
                     'url' => 'https://territorio.laravelconmanuel.dev',
                     'tipo' => 'Gestión territorial + backend de app móvil',
+                    'acceso' => $demo + ['nota' => 'Cuenta de demostración sobre datos anonimizados.'],
                     'resumen' => 'Plataforma gemela de Electoral, orientada a redes y promoción territorial. Es también el backend de la app móvil de campo, con una API pensada para trabajar sin señal y sincronizar después.',
                     'detalles' => [
                         'Mismo patrón Laravel 13 + Inertia/React, con contenedores dedicados y su propia base PostGIS.',
@@ -97,6 +128,24 @@ return [
                     'url' => null,
                     'tipo' => 'App móvil de campo (Android), offline-first',
                     'resumen' => 'La app que usan coordinadores y promotores en la calle. Trabaja sin señal: guarda todo en una base local del teléfono y sincroniza contra Territorio cuando vuelve la conexión.',
+
+                    /*
+                     * El APK se sirve desde el S3 propio (MinIO). No está en Google
+                     * Play a propósito: es un proyecto de demostración y publicar en
+                     * la tienda pide cuenta de desarrollador, revisión y una política
+                     * de privacidad que aquí no aplica.
+                     *
+                     * Si el archivo cambia de lugar o de versión, se ajusta aquí y en
+                     * ningún otro sitio. Con 'url' vacío el botón no se pinta.
+                     */
+                    'descarga' => [
+                        'url' => 'https://s3.laravelconmanuel.dev/descargas/territorio-app-1.0.0.apk',
+                        'etiqueta' => 'Descargar el APK (Android)',
+                        // 179 MB en decimal, que es como lo va a reportar el navegador
+                        // al descargar (el Explorador de Windows dirá 170, en MiB).
+                        'nota' => 'v1.0.0 · 179 MB · No está en Google Play: es un proyecto de demostración. Android pedirá permiso para instalar desde fuera de la tienda.',
+                    ],
+
                     'detalles' => [
                         'React Native con Expo y TypeScript; navegación de drawer + tabs y sistema de diseño propio.',
                         'Offline-first sobre SQLite en el teléfono, con migraciones propias probadas contra una base real: la captura nunca depende de la red.',
@@ -132,51 +181,36 @@ return [
         [
             'grupo' => 'Bots conversacionales',
             'icono' => 'chispa',
-            'resumen' => 'Chatbots de WhatsApp construidos como máquinas de estado sobre n8n; cada uno con su propio Postgres y su subdominio.',
+            'resumen' => 'Chatbot de WhatsApp construido como máquina de estados sobre n8n, con su propio Postgres e integrado al POS por API. Este sí se puede probar en vivo.',
             'proyectos' => [
 
                 [
-                    'nombre' => 'Pipe',
-                    'url' => 'https://pipe.laravelconmanuel.dev',
-                    'tipo' => 'Chatbot de WhatsApp (FSM) para captación en campo',
-                    'resumen' => 'Bot conversacional que atiende WhatsApp, registra a la persona y —solo si ella quiere— levanta una gestión, que llega ya estructurada a la plataforma Electoral.',
-                    'detalles' => [
-                        'Stack n8n + PostgreSQL propio en Docker; el editor va detrás del reverse proxy con TLS y exige inicio de sesión.',
-                        'La conversación es una máquina de estados escrita a mano: cada turno lee el estado en la base de n8n, decide y lo vuelve a guardar, así que el bot no guarda nada en memoria y se puede reiniciar sin perder charlas.',
-                        'El aviso de privacidad va primero y es una barrera real: sin un "acepto" explícito no se guarda ni el nombre.',
-                        'Entra por la Cloud API de Meta a través del gateway Dualhook: verificación del webhook (GET) y mensajes (POST) sobre la misma ruta.',
-                        'Publica en Electoral por API con token Bearer y le devuelve al ciudadano el folio de su gestión; tiene modo simulación para probar el diálogo sin escribir en la plataforma.',
-                    ],
-                    'stack' => ['n8n', 'Chatbots (WhatsApp / FSM)', 'WhatsApp Cloud API', 'Dualhook', 'PostgreSQL', 'Webhooks', 'API REST', 'Docker', 'Nginx'],
-                ],
+                    'nombre' => 'Bot de pedidos del POS',
+                    'url' => null,
+                    'tipo' => 'Chatbot de WhatsApp (FSM) integrado al POS',
+                    'resumen' => 'Bot de WhatsApp que levanta un pedido completo dentro de la conversación —producto, decoración, fecha de entrega y comprobante de pago— y lo registra en el POS a través de su API interna, consultando el catálogo y los precios en vivo.',
 
-                [
-                    'nombre' => 'Reporta un Bache',
-                    'url' => 'https://bache.laravelconmanuel.dev',
-                    'tipo' => 'Civic-tech por WhatsApp con geolocalización',
-                    'resumen' => 'Los ciudadanos reportan baches por WhatsApp con foto y ubicación; el sistema los ubica sobre las capas de la ciudad, evita duplicados y le avisa al ciudadano cuando su reporte se atiende.',
-                    'detalles' => [
-                        'Mismo patrón n8n + Postgres en Docker, con la conversación como máquina de estados.',
-                        'PostGIS con las capas de colonias y secciones cargadas desde shapefiles y reproyectadas: cada reporte cae solo en su colonia y su sección por geocodificación inversa, sin preguntarle la dirección al ciudadano.',
-                        'Deduplicación por cercanía: dos reportes del mismo bache no abren dos folios.',
-                        'Tres flujos separados —captación, consulta de estatus por folio y notificaciones— y el ciudadano puede además verificar si la reparación quedó bien.',
-                        'Consentimiento y perfil del ciudadano guardados aparte del reporte.',
-                        'Entra por la Cloud API de Meta a través de Dualhook, con documentación propia de riesgos de bloqueo de la cuenta y de las decisiones tomadas para evitarlo.',
+                    /*
+                     * Demo en vivo. El número es de pruebas (cuenta demo de Meta
+                     * por Dualhook), no un número personal: por eso se puede
+                     * publicar. Si algún día se pasa al número oficial, hay que
+                     * cambiarlo aquí y en el WABA.
+                     */
+                    'prueba' => [
+                        'numero' => '+1 816-851-0831',
+                        'e164' => '18168510831',
+                        'texto' => 'Hola, quiero hacer un pedido',
+                        'etiqueta' => 'Pruébalo en WhatsApp',
+                        'nota' => 'Número de pruebas: contesta el bot, no una persona. El pedido queda en el sistema de demostración.',
                     ],
-                    'stack' => ['n8n', 'Chatbots (WhatsApp / FSM)', 'WhatsApp Cloud API', 'Dualhook', 'PostGIS', 'PostgreSQL', 'Shapefiles / INE', 'Webhooks', 'Docker'],
-                ],
 
-                [
-                    'nombre' => 'Pycos',
-                    'url' => 'https://pycos.laravelconmanuel.dev',
-                    'tipo' => 'Bot de pedidos integrado al POS',
-                    'resumen' => 'Bot de WhatsApp que toma pedidos de pastelería —producto, decoración, fecha de entrega y comprobante de pago— y los registra en el POS a través de su API interna.',
                     'detalles' => [
                         'n8n + Postgres en Docker; tres workflows: verificación del webhook, entrada de mensajes y la máquina de estados del pedido.',
+                        'La conversación es una máquina de estados: cada turno lee el estado en la base, decide y lo vuelve a guardar, así que el bot no guarda nada en memoria y se puede reiniciar sin perder charlas.',
                         'Consulta el catálogo y resuelve al cliente contra el POS en vivo, y crea el pedido en la sucursal física que eligió la persona (no en el canal web), con una llave de servicio dedicada.',
                         'El comprobante de pago que manda el cliente se descarga de WhatsApp y se sube al POS, que lo guarda en el almacenamiento S3.',
                         'Manda imágenes del catálogo dentro de la conversación cuando el cliente pide ver opciones.',
-                        'La verificación (GET) y los mensajes entrantes (POST) usan una sola URL de webhook: el ruteo por método se resuelve en el reverse proxy nginx.',
+                        'Entra por la Cloud API de Meta a través del gateway Dualhook. La verificación (GET) y los mensajes entrantes (POST) usan una sola URL de webhook: el ruteo por método se resuelve en el reverse proxy nginx.',
                     ],
                     'stack' => ['n8n', 'Chatbots (WhatsApp / FSM)', 'WhatsApp Cloud API', 'Dualhook', 'API REST', 'PostgreSQL', 'MinIO (S3)', 'Webhooks', 'Docker', 'Nginx'],
                 ],

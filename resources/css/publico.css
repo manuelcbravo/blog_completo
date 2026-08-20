@@ -715,6 +715,42 @@ main {
     width: 100%;
 }
 
+/* Tablas del artículo: el contenido las usa para comparar opciones, así que
+   necesitan rejilla visible. El envoltorio con scroll evita que una tabla
+   ancha empuje el ancho de la página entera en el móvil. */
+.prosa table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.prosa thead {
+    background: var(--panel);
+}
+
+.prosa th,
+.prosa td {
+    border: 1px solid var(--line);
+    padding: 10px 14px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.prosa th {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--fg3);
+    white-space: nowrap;
+}
+
+.prosa tbody tr:nth-child(even) {
+    background: color-mix(in oklab, var(--panel) 45%, transparent);
+}
+
 .etiquetas {
     display: flex;
     gap: 10px;
@@ -1007,6 +1043,15 @@ main {
     flex-direction: column;
     gap: 6px;
     font-family: var(--mono);
+}
+
+/* Anuncio dentro del texto: separado del párrafo anterior y del siguiente para
+   que se lea como una pausa y no como parte del artículo. La regla de arriba lo
+   despega del cuerpo sin romper el ritmo de lectura. */
+.anuncio--en-texto {
+    margin: 8px 0;
+    padding-top: 26px;
+    border-top: 1px solid var(--line);
 }
 
 .anuncio__hueco {

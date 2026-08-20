@@ -2,6 +2,7 @@
 
 use App\Enums\EstadoPublicacion;
 use App\Enums\Permiso;
+use App\Enums\Rol;
 use App\Models\Categoria;
 use App\Models\Etiqueta;
 use App\Models\Post;
@@ -11,14 +12,28 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 
-function usuarioConPermiso(string $permiso): User
+function usuarioConPermiso(string ...$permisos): User
 {
-    Permission::findOrCreate($permiso);
+    foreach ($permisos as $permiso) {
+        Permission::findOrCreate($permiso);
+    }
 
     $usuario = User::factory()->create();
-    $usuario->givePermissionTo($permiso);
+    $usuario->givePermissionTo($permisos);
 
     return $usuario;
+}
+
+/**
+ * Un editor completo: consulta, captura, publica y elimina. Se arma desde el
+ * enum del rol para que separar un permiso más no vuelva a romper cada prueba.
+ */
+function usuarioEditor(): User
+{
+    return usuarioConPermiso(...array_map(
+        fn (Permiso $permiso): string => $permiso->value,
+        Rol::Editor->permisos(),
+    ));
 }
 
 test('un usuario sin permiso no entra al listado', function () {
@@ -29,7 +44,7 @@ test('un usuario sin permiso no entra al listado', function () {
 });
 
 test('el listado muestra las publicaciones del tipo pedido', function () {
-    $usuario = usuarioConPermiso(Permiso::BlogPublicacionesGestionar->value);
+    $usuario = usuarioEditor();
     $this->actingAs($usuario);
 
     Post::query()->create([
@@ -58,7 +73,7 @@ test('store crea la publicacion con slug y tiempo de lectura calculados', functi
     config()->set('blog.disco', 'publicaciones');
     Storage::fake('publicaciones');
 
-    $usuario = usuarioConPermiso(Permiso::BlogPublicacionesGestionar->value);
+    $usuario = usuarioEditor();
     $this->actingAs($usuario);
 
     $categoria = Categoria::query()->create(['nombre' => 'Laravel', 'slug' => 'laravel']);
@@ -85,7 +100,7 @@ test('store crea la publicacion con slug y tiempo de lectura calculados', functi
 });
 
 test('store con id actualiza en lugar de crear', function () {
-    $usuario = usuarioConPermiso(Permiso::BlogPublicacionesGestionar->value);
+    $usuario = usuarioEditor();
     $this->actingAs($usuario);
 
     $post = Post::query()->create([
@@ -109,7 +124,7 @@ test('store con id actualiza en lugar de crear', function () {
 });
 
 test('el slug se hace unico cuando ya existe', function () {
-    $usuario = usuarioConPermiso(Permiso::BlogPublicacionesGestionar->value);
+    $usuario = usuarioEditor();
 
     $primero = Post::query()->create([
         'titulo' => 'Guía de despliegue',
@@ -130,7 +145,7 @@ test('el slug se hace unico cuando ya existe', function () {
 });
 
 test('el contenido se guarda desde su propia pantalla', function () {
-    $usuario = usuarioConPermiso(Permiso::BlogPublicacionesGestionar->value);
+    $usuario = usuarioEditor();
     $this->actingAs($usuario);
 
     $post = Post::query()->create([
@@ -149,7 +164,7 @@ test('el contenido se guarda desde su propia pantalla', function () {
 });
 
 test('destroy borra la publicacion', function () {
-    $usuario = usuarioConPermiso(Permiso::BlogPublicacionesGestionar->value);
+    $usuario = usuarioEditor();
     $this->actingAs($usuario);
 
     $post = Post::query()->create([

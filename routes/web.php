@@ -11,6 +11,7 @@ use App\Http\Controllers\Blog\EstadoController;
 use App\Http\Controllers\Blog\EtiquetaController;
 use App\Http\Controllers\Blog\PublicacionController;
 use App\Http\Controllers\Blog\SuscriptorController;
+use App\Http\Controllers\Blog\VisitaController;
 use App\Http\Controllers\Config\RoleController;
 use App\Http\Controllers\Config\UserController;
 use App\Http\Controllers\Publico\FeedController;
@@ -32,6 +33,7 @@ Route::name('publico.')->group(function () {
     Route::get('buscar', [SitioController::class, 'buscar'])->name('buscar');
     Route::get('newsletter', [SitioController::class, 'newsletter'])->name('newsletter');
     Route::get('sobre', [SitioController::class, 'sobre'])->name('sobre');
+    Route::get('privacidad', [SitioController::class, 'privacidad'])->name('privacidad');
     Route::get('manuel', [SitioController::class, 'autor'])->name('autor');
 
     Route::post('newsletter', [SitioController::class, 'suscribir'])
@@ -49,6 +51,7 @@ Route::name('publico.')->group(function () {
 
 Route::get('feed', [FeedController::class, 'feed'])->name('feed');
 Route::get('sitemap.xml', [FeedController::class, 'sitemap'])->name('sitemap');
+Route::get('robots.txt', [FeedController::class, 'robots'])->name('robots');
 
 Route::get('suscripcion/confirmar/{token}', [SuscripcionController::class, 'confirmar'])
     ->name('suscripcion.confirmar');
@@ -60,38 +63,64 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [AnaliticaController::class, 'index'])->name('dashboard');
 
     Route::prefix('blog')->name('blog.')->group(function () {
-        Route::middleware('can:blog.publicaciones.gestionar')->group(function () {
-            Route::prefix('publicaciones/{tipo}')
-                ->whereIn('tipo', TipoPublicacion::segmentos())
-                ->name('publicaciones.')
-                ->group(function () {
+        /*
+         * Las publicaciones se reparten en cuatro grupos y no en uno, para que
+         * exista un perfil que consulte y capture sin poder publicar ni borrar.
+         * Cada accion irreversible -sacar algo al sitio y eliminarlo- pide su
+         * propio permiso.
+         */
+        Route::prefix('publicaciones/{tipo}')
+            ->whereIn('tipo', TipoPublicacion::segmentos())
+            ->name('publicaciones.')
+            ->group(function () {
+                Route::middleware('can:blog.publicaciones.ver')->group(function () {
                     Route::get('/', [PublicacionController::class, 'index'])->name('index');
-                    Route::post('/', [PublicacionController::class, 'store'])->name('store');
-                    Route::delete('{publicacion}', [PublicacionController::class, 'destroy'])->name('destroy');
                     Route::get('{publicacion}/contenido', [ContenidoController::class, 'index'])->name('contenido.index');
-                    Route::post('{publicacion}/contenido', [ContenidoController::class, 'store'])->name('contenido.store');
-                    Route::post('contenido/imagen', [ContenidoController::class, 'imagen'])->name('contenido.imagen');
-                    Route::post('{publicacion}/estado', [EstadoController::class, 'store'])->name('estado.store');
                 });
 
-            Route::prefix('recursos/{recurso}/detalles')->name('detalles.')->group(function () {
-                Route::post('/', [DetalleController::class, 'store'])->name('store');
-                Route::delete('{detalle}', [DetalleController::class, 'destroy'])->name('destroy');
+                Route::middleware('can:blog.publicaciones.gestionar')->group(function () {
+                    Route::post('/', [PublicacionController::class, 'store'])->name('store');
+                    Route::post('{publicacion}/contenido', [ContenidoController::class, 'store'])->name('contenido.store');
+                    Route::post('contenido/imagen', [ContenidoController::class, 'imagen'])->name('contenido.imagen');
+                });
+
+                Route::middleware('can:blog.publicaciones.publicar')
+                    ->post('{publicacion}/estado', [EstadoController::class, 'store'])
+                    ->name('estado.store');
+
+                Route::middleware('can:blog.publicaciones.eliminar')
+                    ->delete('{publicacion}', [PublicacionController::class, 'destroy'])
+                    ->name('destroy');
             });
+
+        Route::prefix('recursos/{recurso}/detalles')->name('detalles.')->group(function () {
+            Route::middleware('can:blog.publicaciones.gestionar')
+                ->post('/', [DetalleController::class, 'store'])
+                ->name('store');
+
+            Route::middleware('can:blog.publicaciones.eliminar')
+                ->delete('{detalle}', [DetalleController::class, 'destroy'])
+                ->name('destroy');
+        });
+
+        Route::middleware('can:blog.taxonomias.ver')->group(function () {
+            Route::get('categorias', [CategoriaController::class, 'index'])->name('categorias.index');
+            Route::get('etiquetas', [EtiquetaController::class, 'index'])->name('etiquetas.index');
         });
 
         Route::middleware('can:blog.taxonomias.gestionar')->group(function () {
-            Route::get('categorias', [CategoriaController::class, 'index'])->name('categorias.index');
             Route::post('categorias', [CategoriaController::class, 'store'])->name('categorias.store');
             Route::delete('categorias/{categoria}', [CategoriaController::class, 'destroy'])->name('categorias.destroy');
 
-            Route::get('etiquetas', [EtiquetaController::class, 'index'])->name('etiquetas.index');
             Route::post('etiquetas', [EtiquetaController::class, 'store'])->name('etiquetas.store');
             Route::delete('etiquetas/{etiqueta}', [EtiquetaController::class, 'destroy'])->name('etiquetas.destroy');
         });
 
+        Route::middleware('can:blog.comentarios.ver')
+            ->get('comentarios', [ComentarioController::class, 'index'])
+            ->name('comentarios.index');
+
         Route::middleware('can:blog.comentarios.moderar')->group(function () {
-            Route::get('comentarios', [ComentarioController::class, 'index'])->name('comentarios.index');
             Route::post('comentarios', [ComentarioController::class, 'store'])->name('comentarios.store');
             Route::delete('comentarios/{comentario}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
         });
@@ -100,6 +129,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('suscriptores', [SuscriptorController::class, 'index'])->name('suscriptores.index');
             Route::post('suscriptores', [SuscriptorController::class, 'store'])->name('suscriptores.store');
             Route::delete('suscriptores/{suscriptor}', [SuscriptorController::class, 'destroy'])->name('suscriptores.destroy');
+        });
+
+        Route::middleware('can:blog.visitas.ver')->group(function () {
+            Route::get('visitas', [VisitaController::class, 'index'])->name('visitas.index');
         });
 
         Route::middleware('can:blog.contactos.gestionar')->group(function () {

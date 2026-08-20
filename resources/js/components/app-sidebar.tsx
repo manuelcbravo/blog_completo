@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import type { InertiaLinkProps } from '@inertiajs/react';
 import {
     ChevronRight,
+    Eye,
     FolderTree,
     GraduationCap,
     Inbox,
@@ -44,6 +45,7 @@ import { index as blogContactos } from '@/routes/blog/contactos';
 import { index as blogEtiquetas } from '@/routes/blog/etiquetas';
 import { index as blogPublicaciones } from '@/routes/blog/publicaciones';
 import { index as blogSuscriptores } from '@/routes/blog/suscriptores';
+import { index as blogVisitas } from '@/routes/blog/visitas';
 import { index as configRoles } from '@/routes/config/roles';
 import { index as configUsers } from '@/routes/config/users';
 
@@ -61,7 +63,7 @@ export function AppSidebar() {
 
     const enlaces: Enlace[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
-        ...(puede('blog.publicaciones.gestionar')
+        ...(puede('blog.publicaciones.ver')
             ? [
                   {
                       title: 'Publicaciones',
@@ -80,7 +82,7 @@ export function AppSidebar() {
                   },
               ]
             : []),
-        ...(puede('blog.taxonomias.gestionar')
+        ...(puede('blog.taxonomias.ver')
             ? [
                   {
                       title: 'Categorías',
@@ -90,7 +92,7 @@ export function AppSidebar() {
                   { title: 'Etiquetas', href: blogEtiquetas(), icon: Tags },
               ]
             : []),
-        ...(puede('blog.comentarios.moderar')
+        ...(puede('blog.comentarios.ver')
             ? [
                   {
                       title: 'Comentarios',
@@ -110,6 +112,9 @@ export function AppSidebar() {
             : []),
         ...(puede('blog.contactos.gestionar')
             ? [{ title: 'Mensajes', href: blogContactos(), icon: Inbox }]
+            : []),
+        ...(puede('blog.visitas.ver')
+            ? [{ title: 'Visitas', href: blogVisitas(), icon: Eye }]
             : []),
     ];
 

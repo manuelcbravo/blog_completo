@@ -13,10 +13,14 @@ use Spatie\Permission\Models\Permission;
 
 function moderador(): User
 {
+    Permission::findOrCreate(Permiso::BlogComentariosVer->value);
     Permission::findOrCreate(Permiso::BlogComentariosModerar->value);
 
     $usuario = User::factory()->create();
-    $usuario->givePermissionTo(Permiso::BlogComentariosModerar->value);
+    $usuario->givePermissionTo([
+        Permiso::BlogComentariosVer->value,
+        Permiso::BlogComentariosModerar->value,
+    ]);
 
     return $usuario;
 }

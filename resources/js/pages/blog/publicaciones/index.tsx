@@ -34,6 +34,7 @@ import { Label } from '@/components/ui/label';
 import { formatDate } from '@/lib/date';
 import { resolveFormErrorMessage } from '@/lib/form-error-message';
 import { destroy, index, store } from '@/routes/blog/publicaciones';
+import { usePermisos } from '@/hooks/use-permisos';
 import { index as contenidoIndex } from '@/routes/blog/publicaciones/contenido';
 import { store as estadoStore } from '@/routes/blog/publicaciones/estado';
 import type { SelectOption } from '@/types';
@@ -155,6 +156,13 @@ export default function PublicacionesIndex({
 }) {
     const [activa, setActiva] = useState<PublicacionRow | null>(null);
     const [formMode, setFormMode] = useState<'create' | 'edit' | null>(null);
+    // El backend es quien decide de verdad; esto sólo evita ofrecer botones
+    // que van a devolver un 403.
+    const { puede } = usePermisos();
+    const puedePublicar = puede('blog.publicaciones.publicar');
+    const puedeEliminar = puede('blog.publicaciones.eliminar');
+    const puedeEditar = puede('blog.publicaciones.gestionar');
+
     const [porEliminar, setPorEliminar] = useState<PublicacionRow | null>(null);
     const [detallesDeId, setDetallesDeId] = useState<number | null>(null);
     const [estadoDe, setEstadoDe] = useState<PublicacionRow | null>(null);
@@ -395,11 +403,13 @@ export default function PublicacionesIndex({
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            onSelect={() => abrirEditar(registro)}
-                        >
-                            <Pencil className="mr-2 size-4" /> Editar
-                        </DropdownMenuItem>
+                        {puedeEditar && (
+                            <DropdownMenuItem
+                                onSelect={() => abrirEditar(registro)}
+                            >
+                                <Pencil className="mr-2 size-4" /> Editar
+                            </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem
                             onSelect={() =>
                                 router.get(
@@ -412,12 +422,14 @@ export default function PublicacionesIndex({
                         >
                             <FileText className="mr-2 size-4" /> Contenido
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onSelect={() => abrirEstado(registro)}
-                        >
-                            <SlidersHorizontal className="mr-2 size-4" />{' '}
-                            Estatus
-                        </DropdownMenuItem>
+                        {puedePublicar && (
+                            <DropdownMenuItem
+                                onSelect={() => abrirEstado(registro)}
+                            >
+                                <SlidersHorizontal className="mr-2 size-4" />{' '}
+                                Estatus
+                            </DropdownMenuItem>
+                        )}
                         {tipo.tieneDetalles && (
                             <DropdownMenuItem
                                 onSelect={() => setDetallesDeId(registro.id)}
@@ -435,13 +447,17 @@ export default function PublicacionesIndex({
                                 el sitio
                             </a>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            variant="destructive"
-                            onSelect={() => setPorEliminar(registro)}
-                        >
-                            <Trash2 className="mr-2 size-4" /> Eliminar
-                        </DropdownMenuItem>
+                        {puedeEliminar && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    onSelect={() => setPorEliminar(registro)}
+                                >
+                                    <Trash2 className="mr-2 size-4" /> Eliminar
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),
@@ -493,9 +509,11 @@ export default function PublicacionesIndex({
                                     ]}
                                 />
                             </div>
-                            <Button onClick={abrirCrear}>
-                                <Plus className="mr-2 size-4" /> Nuevo
-                            </Button>
+                            {puedeEditar && (
+                                <Button onClick={abrirCrear}>
+                                    <Plus className="mr-2 size-4" /> Nuevo
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>

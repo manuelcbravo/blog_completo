@@ -3,6 +3,14 @@
     :descripcion="$publicacion->meta_descripcion ?: $publicacion->resumen"
     og-tipo="article"
     :og-imagen="$publicacion->imagenUrl()"
+    :publicacion="$publicacion"
+    :migas="array_values(array_filter([
+        ['nombre' => 'Inicio', 'url' => route('home')],
+        $publicacion->categoria
+            ? ['nombre' => $publicacion->categoria->nombre, 'url' => route('publico.categoria', $publicacion->categoria->slug)]
+            : null,
+        ['nombre' => $publicacion->titulo, 'url' => url()->current()],
+    ]))"
 >
 
     <div class="contenedor">
@@ -36,9 +44,21 @@
 
             <x-publico.imagen :publicacion="$publicacion" variante="articulo" />
 
+            @php
+                [$cuerpoAntes, $cuerpoDespues] = \App\Support\Publico\CuerpoConAnuncio::partir($publicacion->contenido);
+            @endphp
+
             <div class="prosa">
-                {!! $publicacion->contenido !!}
+                {!! $cuerpoAntes !!}
             </div>
+
+            @if ($cuerpoDespues !== '')
+                <x-publico.anuncio formato="en-texto" class="anuncio--en-texto" />
+
+                <div class="prosa">
+                    {!! $cuerpoDespues !!}
+                </div>
+            @endif
 
             @if ($tipo->tieneDetalles() && $publicacion->detalles->isNotEmpty())
                 <section style="display: flex; flex-direction: column; gap: 14px;">

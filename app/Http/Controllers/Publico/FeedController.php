@@ -24,6 +24,35 @@ class FeedController extends Controller
             ->header('Content-Type', 'application/xml; charset=utf-8');
     }
 
+    /**
+     * El robots.txt se sirve desde aquí y no como archivo estático para que la
+     * dirección del sitemap salga siempre de APP_URL. Un robots con el dominio
+     * escrito a mano es de las cosas que se quedan apuntando a staging.
+     */
+    public function robots(): Response
+    {
+        $lineas = [
+            'User-agent: *',
+            'Allow: /',
+            '',
+            '# El panel no tiene nada que indexar y pide sesión.',
+            'Disallow: /blog/',
+            'Disallow: /config/',
+            'Disallow: /dashboard',
+            'Disallow: /login',
+            'Disallow: /register',
+            'Disallow: /settings/',
+            'Disallow: /suscripcion/',
+            '',
+            'Sitemap: '.route('sitemap'),
+        ];
+
+        return response(implode('
+', $lineas).'
+')
+            ->header('Content-Type', 'text/plain; charset=utf-8');
+    }
+
     public function sitemap(): Response
     {
         $urls = [

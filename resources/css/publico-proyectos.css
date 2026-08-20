@@ -65,6 +65,13 @@
     .proyectos-lista {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    /* Una sola tarjeta: se queda a la izquierda, alineada con las demás, y con
+       tope de ancho para que no se estiren las líneas de texto. */
+    .proyectos-lista--unica {
+        grid-template-columns: minmax(0, 760px);
+        justify-content: start;
+    }
 }
 
 /* --- Tarjeta de proyecto --- */
@@ -138,11 +145,80 @@
     cursor: default;
 }
 
+.proyecto__enlace--demo {
+    color: var(--accent);
+    border-color: var(--accent-dim);
+    cursor: default;
+}
+
 .proyecto__resumen {
     font-size: 14px;
     line-height: 1.6;
     color: var(--fg2);
     margin: 0;
+}
+
+/* --- Cuenta de demostración -----------------------------------------------
+   Va pegada al resumen, antes de la ficha técnica: quien llega quiere entrar a
+   verlo, no leer la arquitectura. Fondo propio para que se lea como un apunte
+   y no como una viñeta más. */
+.proyecto__acceso {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px dashed var(--line2);
+}
+
+.proyecto__acceso-icono {
+    flex-shrink: 0;
+    margin-top: 2px;
+    width: 15px;
+    height: 15px;
+    color: var(--accent);
+}
+
+.proyecto__acceso-cuerpo {
+    min-width: 0;
+    flex: 1;
+}
+
+.proyecto__acceso-titulo {
+    display: block;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 7px;
+}
+
+.proyecto__acceso-datos {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 3px 10px;
+    margin: 0;
+}
+
+.proyecto__acceso-datos dt {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg3);
+}
+
+.proyecto__acceso-datos dd {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg);
+    overflow-wrap: anywhere;
+    user-select: all; /* un clic selecciona el valor completo, listo para copiar */
+}
+
+.proyecto__acceso-nota {
+    margin: 8px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--fg3);
 }
 
 .proyecto__detalles {
@@ -177,6 +253,153 @@
     background: #f97316;
 }
 
+/* --- Acordeón "ver más" de los detalles ---------------------------------- */
+.proyecto__mas {
+    margin-top: 2px;
+}
+
+/* Tiene que leerse como un control, no como un pie de nota: en gris tenue se
+   perdía entre las viñetas. Va en el color de acento y con caja propia, pero
+   sin relleno, para no competir con el botón de prueba en la misma tarjeta. */
+.proyecto__mas-boton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 13px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    background: var(--bg);
+    border: 1px solid var(--accent-dim);
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Quita el triangulito nativo (Chrome/Safari usan este pseudo, Firefox el de arriba). */
+.proyecto__mas-boton::-webkit-details-marker {
+    display: none;
+}
+
+.proyecto__mas-boton:hover,
+.proyecto__mas-boton:focus-visible {
+    border-color: var(--accent);
+    background: var(--panel);
+}
+
+.proyecto__mas-boton:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.proyecto--acento .proyecto__mas-boton {
+    color: #f97316;
+    border-color: rgba(249, 115, 22, 0.55);
+}
+
+.proyecto--acento .proyecto__mas-boton:hover {
+    border-color: #f97316;
+}
+
+.proyecto__mas-icono {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.proyecto__mas[open] .proyecto__mas-icono {
+    transform: rotate(180deg);
+}
+
+.proyecto__mas-cerrar {
+    display: none;
+}
+
+.proyecto__mas[open] .proyecto__mas-abrir {
+    display: none;
+}
+
+.proyecto__mas[open] .proyecto__mas-cerrar {
+    display: inline;
+}
+
+.proyecto__detalles--extra {
+    margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .proyecto__mas-icono {
+        transition: none;
+    }
+}
+
 .proyecto__stack {
     margin-top: 4px;
+}
+
+/* --- Acción principal de la tarjeta --------------------------------------
+   Para los proyectos que no se visitan en el navegador: el bot se prueba
+   conversando y la app se instala. Ocupa el ancho completo y pesa más que el
+   enlace de la cabecera, porque es lo que se quiere que la gente haga. */
+.proyecto__accion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 4px;
+    padding: 14px 16px;
+    background: var(--accent);
+    color: var(--bg);
+    text-decoration: none;
+    border: 1px solid var(--accent);
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.proyecto__accion:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent-dim);
+    transform: translateY(-1px);
+}
+
+.proyecto__accion-icono {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+}
+
+.proyecto__accion-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+}
+
+.proyecto__accion-texto strong {
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.proyecto__accion-texto small {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.45;
+    opacity: 0.85;
+}
+
+.proyecto__accion-flecha {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 480px) {
+    .proyecto__accion-flecha {
+        display: none;
+    }
 }

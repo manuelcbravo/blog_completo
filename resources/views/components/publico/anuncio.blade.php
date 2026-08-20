@@ -5,6 +5,7 @@
         'sidebar' => ['medida' => '300 × 250', 'alto' => 'aspect-ratio: 300/250;', 'rotulo' => 'Publicidad'],
         'articulo' => ['medida' => '728 × 90', 'alto' => 'height: 120px;', 'rotulo' => 'Patrocinado'],
         'leaderboard' => ['medida' => '970 × 90', 'alto' => 'height: 100px;', 'rotulo' => 'Publicidad'],
+        'en-texto' => ['medida' => '336 × 280', 'alto' => 'height: 280px;', 'rotulo' => 'Publicidad'],
     ];
     $config = $formatos[$formato] ?? $formatos['sidebar'];
 @endphp

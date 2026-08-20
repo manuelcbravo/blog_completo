@@ -6,6 +6,7 @@ use App\Actions\Blog\RegistrarComentario;
 use App\Actions\Blog\RegistrarContacto;
 use App\Actions\Blog\RegistrarSuscriptor;
 use App\Enums\EstadoComentario;
+use App\Enums\SeccionSitio;
 use App\Enums\TipoPublicacion;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Publico\ComentarRequest;
@@ -252,15 +253,24 @@ class SitioController extends Controller
         return view('publico.sobre');
     }
 
-    public function proyectos(): View
+    public function privacidad(): View
     {
+        return view('publico.privacidad');
+    }
+
+    public function proyectos(Request $request): View
+    {
+        $this->registrarVistaPagina($request, SeccionSitio::Proyectos);
+
         return view('publico.proyectos', [
             'proyectos' => config('proyectos'),
         ]);
     }
 
-    public function autor(): View
+    public function autor(Request $request): View
     {
+        $this->registrarVistaPagina($request, SeccionSitio::Autor);
+
         $publicaciones = Post::query()
             ->publicadas()
             ->with('categoria')
@@ -327,6 +337,27 @@ class SitioController extends Controller
             ->get();
     }
 
+    private function registrarVistaPagina(Request $request, SeccionSitio $seccion): void
+    {
+        $clave = "vista:pagina:{$seccion->value}";
+
+        if ($request->session()->has($clave)) {
+            return;
+        }
+
+        $request->session()->put($clave, true);
+
+        Vista::query()->create([
+            'post_id' => null,
+            'tipo' => $seccion->value,
+            'ruta' => $request->path(),
+            'ip_address' => $request->ip(),
+            'user_agent' => substr((string) $request->userAgent(), 0, 500),
+            'referer' => $request->header('referer'),
+            'session_id' => $request->session()->getId(),
+        ]);
+    }
+
     private function registrarVista(Request $request, Publicacion $publicacion): void
     {
         $clave = "vista:{$publicacion->tipo()->value}:{$publicacion->id}";
@@ -340,6 +371,7 @@ class SitioController extends Controller
         Vista::query()->create([
             'post_id' => $publicacion->id,
             'tipo' => $publicacion->tipo()->value,
+            'ruta' => $request->path(),
             'ip_address' => $request->ip(),
             'user_agent' => substr((string) $request->userAgent(), 0, 500),
             'referer' => $request->header('referer'),

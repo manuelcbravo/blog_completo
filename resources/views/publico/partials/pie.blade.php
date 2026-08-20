@@ -12,5 +12,6 @@
         @endif
         <a href="{{ route('publico.sobre') }}">sobre</a>
         <a href="{{ route('publico.newsletter') }}">newsletter</a>
+        <a href="{{ route('publico.privacidad') }}">privacidad</a>
     </div>
 </footer>

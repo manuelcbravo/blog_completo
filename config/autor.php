@@ -127,13 +127,13 @@ return [
     ],
 
     'aptitudes' => [
-        ['grupo' => 'Backend', 'icono' => 'servidor', 'items' => ['PHP', 'Laravel', 'Livewire', 'Node.js', 'API REST', 'Webhooks', 'Colas', 'Java / Spring Boot', 'JPA / Hibernate']],
+        ['grupo' => 'Backend', 'icono' => 'servidor', 'items' => ['PHP', 'Laravel', 'Livewire', 'Node.js', 'API REST', 'Webhooks', 'Colas', 'Java / Spring Boot']],
         ['grupo' => 'Frontend', 'icono' => 'ventana', 'items' => ['React', 'Inertia.js', 'Vue.js', 'TypeScript', 'HTML5', 'Tailwind CSS', 'shadcn/ui', 'Vite', 'Highcharts']],
         ['grupo' => 'Móvil', 'icono' => 'telefono', 'items' => ['React Native', 'Expo', 'Offline-first', 'SQLite', 'OCR (ML Kit)', 'Android / APK']],
         ['grupo' => 'Datos', 'icono' => 'base-datos', 'items' => ['PostgreSQL', 'Tratamiento de datos', 'Optimización de consultas', 'Caché', 'Excel / Exportaciones', 'PDF / Documentos', 'Backups / pg_restore']],
         ['grupo' => 'Geoespacial y datos públicos', 'icono' => 'mapa', 'items' => ['Google Maps API', 'MapLibre GL', 'Mapas dinámicos', 'KML / GeoJSON', 'Mapas SVG', 'PostGIS', 'Shapefiles / INE', 'Datos del INE', 'Datos del INEGI']],
         ['grupo' => 'Arquitectura', 'icono' => 'capas', 'items' => ['OOP', 'Patrones de diseño', 'MVC', 'Sistemas escalables']],
-        ['grupo' => 'Autenticación y control de acceso', 'icono' => 'escudo', 'items' => ['Roles y permisos (RBAC)', 'Autenticación por token', 'Passkeys / WebAuthn', 'Autenticación en dos pasos', 'Bitácora de auditoría']],
+        ['grupo' => 'Autenticación y control de acceso', 'icono' => 'escudo', 'items' => ['Roles y permisos (RBAC)', 'Autenticación por token', 'Autenticación en dos pasos', 'Bitácora de auditoría']],
         ['grupo' => 'Integraciones', 'icono' => 'enchufe', 'destacado' => true, 'items' => ['SAT / CFDI', 'Mercado Libre', 'WhatsApp Cloud API', 'Dualhook', 'Pasarelas de pago', 'S3 API']],
         ['grupo' => 'IA y automatización', 'icono' => 'chispa', 'items' => ['IA generativa', 'Visión por computadora', 'Salidas estructuradas (JSON Schema)', 'n8n', 'Chatbots (WhatsApp / FSM)']],
         ['grupo' => 'Infraestructura', 'icono' => 'nube', 'items' => ['Git', 'GitHub', 'VPS', 'Cloudflare', 'Despliegue continuo']],
@@ -145,7 +145,7 @@ return [
     'especialidad' => ['Laravel', 'PHP', 'React', 'PostgreSQL'],
 
     // Lo que va resaltado en el listado, además del grupo marcado como destacado.
-    'destacadas' => ['Laravel', 'PHP', 'React', 'PostgreSQL', 'React Native', 'PMBOK'],
+    'destacadas' => ['Laravel', 'PHP', 'React', 'PostgreSQL', 'React Native', 'PMBOK', 'HTML5', 'Shapefiles / INE', 'Datos del INE', 'Datos del INEGI'],
 
     // Items con acento naranja (destaque especial, aparte del resaltado normal).
     'acento' => ['MinIO (S3)'],

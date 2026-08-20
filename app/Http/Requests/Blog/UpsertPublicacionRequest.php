@@ -3,16 +3,57 @@
 namespace App\Http\Requests\Blog;
 
 use App\Enums\EstadoPublicacion;
+use App\Enums\Permiso;
 use App\Enums\TipoPublicacion;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpsertPublicacionRequest extends FormRequest
 {
+    /**
+     * Los estados que no sacan nada al sitio público ni lo retiran de él.
+     *
+     * @var list<string>
+     */
+    private const ESTADOS_SIN_PERMISO = ['borrador', 'revision'];
+
     public function tipo(): TipoPublicacion
     {
         return TipoPublicacion::desdeSegmento((string) $this->route('tipo'));
+    }
+
+    /**
+     * El upsert recibe el estado como un campo más, así que sin este guardia
+     * cualquiera con permiso de captura podría publicar mandando
+     * `estado=publicado` en el formulario, saltándose la ruta de estado que sí
+     * está protegida. Sin el permiso de publicar, el estado no se puede llevar
+     * a uno público ni cambiar el de algo que ya lo está.
+     */
+    private function reglaDeEstado(?int $id): Closure
+    {
+        return function (string $atributo, mixed $valor, Closure $falla) use ($id): void {
+            if ($this->user()?->can(Permiso::BlogPublicacionesPublicar->value)) {
+                return;
+            }
+
+            // `value()` aplica el cast del modelo, así que lo que vuelve es el
+            // enum y no la cadena que llega del formulario.
+            $actual = $id === null
+                ? null
+                : $this->tipo()->modelo()::query()->whereKey($id)->value('estado');
+
+            if ($actual instanceof EstadoPublicacion && $valor === $actual->value) {
+                return;
+            }
+
+            if (in_array($valor, self::ESTADOS_SIN_PERMISO, true)) {
+                return;
+            }
+
+            $falla('No tienes permiso para publicar ni retirar publicaciones. Guarda como borrador.');
+        };
     }
 
     /**
@@ -35,7 +76,7 @@ class UpsertPublicacionRequest extends FormRequest
             'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9\-]+$/', $slugUnico],
             'resumen' => ['nullable', 'string', 'max:255'],
             'tags_seo' => ['required', 'string', 'max:500'],
-            'estado' => ['required', Rule::enum(EstadoPublicacion::class)],
+            'estado' => ['required', Rule::enum(EstadoPublicacion::class), $this->reglaDeEstado($id)],
             'fecha_publicacion' => [
                 'nullable',
                 'date',

@@ -11,10 +11,17 @@ use Spatie\Permission\Models\Permission;
 
 function autorDeProgramadas(): User
 {
-    Permission::findOrCreate(Permiso::BlogPublicacionesGestionar->value);
+    // Programar es publicar con retraso, así que pide el permiso de publicar.
+    foreach ([Permiso::BlogPublicacionesVer, Permiso::BlogPublicacionesGestionar, Permiso::BlogPublicacionesPublicar] as $permiso) {
+        Permission::findOrCreate($permiso->value);
+    }
 
     $usuario = User::factory()->create();
-    $usuario->givePermissionTo(Permiso::BlogPublicacionesGestionar->value);
+    $usuario->givePermissionTo([
+        Permiso::BlogPublicacionesVer->value,
+        Permiso::BlogPublicacionesGestionar->value,
+        Permiso::BlogPublicacionesPublicar->value,
+    ]);
 
     return $usuario;
 }

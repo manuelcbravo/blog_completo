@@ -5,6 +5,8 @@
     'ogImagen' => null,
     'seccion' => null,
     'noindex' => false,
+    'publicacion' => null,
+    'migas' => [],
 ])
 
 @php
@@ -35,7 +37,24 @@
     @if ($ogImagen)
         <meta property="og:image" content="{{ $ogImagen }}">
     @endif
+    <meta property="og:locale" content="es_MX">
+    @if ($publicacion !== null)
+        <meta property="article:published_time" content="{{ $publicacion->fecha_publicacion?->toIso8601String() }}">
+        <meta property="article:modified_time" content="{{ $publicacion->updated_at?->toIso8601String() }}">
+        <meta property="article:author" content="{{ config('autor.nombre').' '.config('autor.apellidos') }}">
+        @if ($publicacion->categoria)
+            <meta property="article:section" content="{{ $publicacion->categoria->nombre }}">
+        @endif
+        @foreach ($publicacion->etiquetas as $etiqueta)
+            <meta property="article:tag" content="{{ $etiqueta->nombre }}">
+        @endforeach
+    @endif
+
     <meta name="twitter:card" content="{{ $ogImagen ? 'summary_large_image' : 'summary' }}">
+    <meta name="theme-color" content="#0d0f0e">
+    <meta name="author" content="{{ config('autor.nombre').' '.config('autor.apellidos') }}">
+
+    <x-publico.datos-estructurados :publicacion="$publicacion" :migas="$migas" />
 
     <link rel="icon" href="{{ asset('assets/img/logos/logo_isotipo.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('assets/img/logos/logo_isotipo.png') }}">
