@@ -159,6 +159,22 @@
                                 </a>
                             @endif
 
+                            @if (! empty($proyecto['repositorio']['url']))
+                                <a
+                                    class="proyecto__accion proyecto__accion--repositorio"
+                                    href="{{ $proyecto['repositorio']['url'] }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <x-publico.icono nombre="github" class="proyecto__accion-icono" />
+                                    <span class="proyecto__accion-texto">
+                                        <strong>{{ $proyecto['repositorio']['etiqueta'] }}</strong>
+                                        <small>{{ $proyecto['repositorio']['nota'] }}</small>
+                                    </span>
+                                    <x-publico.icono nombre="flecha" class="proyecto__accion-flecha" />
+                                </a>
+                            @endif
+
                             <div class="tecnologias proyecto__stack">
                                 @foreach ($proyecto['stack'] as $tech)
                                     <x-publico.tecnologia :nombre="$tech" />

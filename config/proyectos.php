@@ -175,6 +175,39 @@ return [
                     'stack' => ['Java / Spring Boot', 'Spring Security', 'JPA / Hibernate', 'Bean Validation', 'Maven', 'JDBC', 'PostgreSQL', 'API REST', 'Autenticación por token', 'Docker', 'Nginx'],
                 ],
 
+                [
+                    'nombre' => 'Este sitio',
+                    'url' => 'https://laravelconmanuel.dev',
+                    'tipo' => 'Blog técnico y portafolio, con su panel de redacción',
+                    'resumen' => 'La página que estás leyendo. Sitio público, panel para escribir y publicar, newsletter y analítica de visitas — con el mismo patrón de despliegue que todo lo demás de esta lista. Es el único proyecto del que además puedes ver el código.',
+
+                    'acceso' => $demo + ['nota' => 'Entra al panel: ves publicaciones, borradores, comentarios y analítica, y puedes editar. Publicar y eliminar quedan fuera.'],
+
+                    /*
+                     * El repositorio es público. Va aparte de `url` porque no es
+                     * el sitio: es el código del sitio, y merece su propio botón.
+                     */
+                    'repositorio' => [
+                        'url' => 'https://github.com/manuelcbravo/blog_completo',
+                        'etiqueta' => 'Ver el código en GitHub',
+                        'nota' => 'Repositorio público: clónalo, léelo o quédatelo. Es el mismo código que sirve esta página.',
+                    ],
+
+                    'detalles' => [
+                        'Laravel 13 con Inertia + React y TypeScript; editor de texto enriquecido con Tiptap para escribir las publicaciones.',
+                        'Tres tipos de contenido con la misma base —artículos, tutoriales y recursos— separados por tabla y con su propia portada, más categorías y etiquetas.',
+                        'Publicaciones programadas: un comando en el scheduler las saca a la hora fijada sin que nadie esté presente.',
+                        'Roles y permisos declarados en enums de PHP y sembrados en base: el rol de demostración ve y edita, pero no publica ni borra.',
+                        'Acceso sin contraseña con llaves de acceso (passkeys) además del correo y contraseña de siempre.',
+                        'Newsletter con confirmación por correo en dos pasos y baja por enlace firmado; comentarios con moderación.',
+                        'Analítica propia de visitas con tableros de Highcharts, sin depender de un tercero ni poner un rastreador ajeno en la página.',
+                        'Imágenes de las publicaciones en el S3 propio (MinIO), no en el disco del contenedor.',
+                        'SEO por publicación: meta título y descripción, feed, sitemap y la posibilidad de marcar una página como no indexable.',
+                        'Desplegado desde este mismo repositorio: un script en el servidor trae el commit, reconstruye la imagen, migra y regenera cachés.',
+                    ],
+                    'stack' => ['Laravel', 'PHP', 'Inertia.js', 'React', 'TypeScript', 'Tailwind CSS', 'PostgreSQL', 'Roles y permisos (RBAC)', 'Passkeys / WebAuthn', 'Highcharts', 'MinIO (S3)', 'Colas', 'Docker', 'Nginx', 'Git'],
+                ],
+
             ],
         ],
 
