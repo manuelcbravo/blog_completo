@@ -23,10 +23,20 @@
     $config = $formatos[$formato] ?? $formatos['sidebar'];
     $cliente = config('blog.anuncios.cliente');
     $bloque = config('blog.anuncios.bloques.'.$formato);
+
     $real = filled($cliente) && filled($bloque);
+
+    /*
+     * Con cuenta configurada pero sin bloque para este formato no se pinta
+     * nada. El hueco rayado es una herramienta de maqueta; en el sitio en
+     * vivo sería un recuadro punteado que el visitante no entiende. Eso pasa
+     * mientras se da de alta AdSense: el identificador de cliente llega
+     * primero y los bloques después.
+     */
+    $maqueta = blank($cliente);
 @endphp
 
-@if (config('blog.anuncios.activos'))
+@if (config('blog.anuncios.activos') && ($real || $maqueta))
     <div {{ $attributes->class('anuncio') }}>
         {{-- La ley y las políticas de AdSense piden que se distinga del contenido. --}}
         <span class="rotulo">{{ $config['rotulo'] }}</span>

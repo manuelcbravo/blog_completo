@@ -32,9 +32,38 @@
             <p>
                 Sirve para saber qué contenido le interesa a la gente y desde dónde
                 llega. No se usa para identificarte ni se cruza con ninguna otra
-                base de datos, y no hay publicidad ni rastreadores de terceros en
-                estas páginas.
+                base de datos.
             </p>
+
+            @if (config('blog.anuncios.activos') && filled(config('blog.anuncios.cliente')))
+                <h2 class="titulo-seccion titulo-seccion--menor">Publicidad</h2>
+
+                <p>
+                    Este sitio muestra anuncios de <strong>Google AdSense</strong>, y
+                    así es como se paga el servidor. Google y sus socios usan cookies
+                    para elegir qué anuncio enseñarte y para no repetirte el mismo,
+                    y pueden basarse en las páginas que visitaste aquí o en otros
+                    sitios.
+                </p>
+
+                <p>
+                    Yo no recibo ningún dato tuyo de esa publicidad: veo cuántas veces
+                    se mostró un anuncio y cuánto generó, nunca quién lo vio.
+                </p>
+
+                <p>
+                    Puedes desactivar la personalización de anuncios en la
+                    <a href="https://www.google.com/settings/ads" rel="noopener" target="_blank">configuración
+                    de anuncios de Google</a>, o revisar cómo tratan tus datos en su
+                    <a href="https://policies.google.com/technologies/partner-sites" rel="noopener" target="_blank">política
+                    para sitios asociados</a>. Bloquear las cookies desde tu navegador
+                    también funciona: el sitio se lee igual.
+                </p>
+            @else
+                <p>
+                    No hay publicidad ni rastreadores de terceros en estas páginas.
+                </p>
+            @endif
 
             <h2 class="titulo-seccion titulo-seccion--menor">Qué se registra si tú lo escribes</h2>
 

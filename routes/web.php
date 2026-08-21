@@ -52,6 +52,7 @@ Route::name('publico.')->group(function () {
 Route::get('feed', [FeedController::class, 'feed'])->name('feed');
 Route::get('sitemap.xml', [FeedController::class, 'sitemap'])->name('sitemap');
 Route::get('robots.txt', [FeedController::class, 'robots'])->name('robots');
+Route::get('ads.txt', [FeedController::class, 'adsTxt'])->name('ads');
 
 Route::get('suscripcion/confirmar/{token}', [SuscripcionController::class, 'confirmar'])
     ->name('suscripcion.confirmar');
