@@ -174,7 +174,16 @@ export function DialogoDetalles({
                                                     recurso: recurso.id,
                                                     detalle: detalle.id,
                                                 }),
-                                                { preserveScroll: true },
+                                                {
+                                                    preserveScroll: true,
+                                                    onError: (errors) =>
+                                                        toast.error(
+                                                            resolveFormErrorMessage(
+                                                                errors,
+                                                                'No se pudo eliminar el archivo.',
+                                                            ),
+                                                        ),
+                                                },
                                             );
                                         }}
                                     >

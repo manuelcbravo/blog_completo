@@ -25,14 +25,6 @@
     $bloque = config('blog.anuncios.bloques.'.$formato);
 
     $real = filled($cliente) && filled($bloque);
-
-    /*
-     * Con cuenta configurada pero sin bloque para este formato no se pinta
-     * nada. El hueco rayado es una herramienta de maqueta; en el sitio en
-     * vivo sería un recuadro punteado que el visitante no entiende. Eso pasa
-     * mientras se da de alta AdSense: el identificador de cliente llega
-     * primero y los bloques después.
-     */
     $maqueta = blank($cliente);
 @endphp
 

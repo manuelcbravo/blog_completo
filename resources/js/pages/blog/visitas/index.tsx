@@ -1,5 +1,7 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Eye, Globe, Link2, Users } from 'lucide-react';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 import { DataTable } from '@/components/data-table';
 import type { DataTableColumn, DataTableServer } from '@/components/data-table';
 import { FormSelectField } from '@/components/form-select-field';
@@ -69,6 +71,18 @@ export default function VisitasIndex({
     tipos: SelectOption[];
     resumen: Resumen;
 }) {
+    const { flash } = usePage().props;
+
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash?.error, flash?.success]);
+
     const filtrar = (cambios: Partial<typeof filtros>) => {
         const siguiente = { ...filtros, ...cambios };
 
