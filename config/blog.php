@@ -16,6 +16,38 @@ return [
 
     'palabras_por_minuto' => (int) env('BLOG_PALABRAS_POR_MINUTO', 200),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Publicidad
+    |--------------------------------------------------------------------------
+    |
+    | `activos` enciende los espacios. Sin `cliente` se pintan los huecos de
+    | maqueta, que es lo que quieres en local: se ve dónde caen los anuncios sin
+    | cargar nada de Google ni ensuciar tus métricas con impresiones falsas.
+    |
+    | Con `cliente` y el bloque correspondiente, se renderiza el anuncio real.
+    | Un formato sin bloque configurado no pinta nada: más vale un espacio
+    | vacío que un recuadro roto.
+    |
+    */
+
+    'anuncios' => [
+
+        'activos' => (bool) env('BLOG_ANUNCIOS', false),
+
+        // El ca-pub-XXXXXXXXXXXXXXXX de tu cuenta de AdSense.
+        'cliente' => env('BLOG_ADSENSE_CLIENTE'),
+
+        // El identificador numérico de cada bloque, uno por formato.
+        'bloques' => [
+            'leaderboard' => env('BLOG_ADSENSE_LEADERBOARD'),
+            'sidebar' => env('BLOG_ADSENSE_SIDEBAR'),
+            'en-texto' => env('BLOG_ADSENSE_EN_TEXTO'),
+            'articulo' => env('BLOG_ADSENSE_ARTICULO'),
+        ],
+
+    ],
+
     'sitio' => [
 
         'marca' => env('BLOG_MARCA', 'laravelconmanuel'),
@@ -25,7 +57,6 @@ return [
             'Artículos de Laravel salidos de proyectos que están en producción.',
         ),
 
-        'anuncios' => (bool) env('BLOG_ANUNCIOS', false),
 
         'autor' => [
             'nombre' => env('BLOG_AUTOR', 'Manuel Cerda Bravo'),

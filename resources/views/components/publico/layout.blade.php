@@ -68,6 +68,15 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
     @vite(['resources/css/publico.css', 'resources/js/publico.js'])
+
+    {{-- El script de AdSense va una sola vez por página, no una por bloque.
+         Sólo se carga si hay cuenta configurada: sin esto, en local estarías
+         pidiendo anuncios a Google desde un dominio que no le consta. --}}
+    @if (config('blog.anuncios.activos') && filled(config('blog.anuncios.cliente')))
+        <script async
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ config('blog.anuncios.cliente') }}"
+                crossorigin="anonymous"></script>
+    @endif
 </head>
 <body>
     <a class="saltar" href="#contenido">Saltar al contenido</a>
