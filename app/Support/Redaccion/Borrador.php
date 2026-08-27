@@ -4,9 +4,11 @@ namespace App\Support\Redaccion;
 
 use App\Enums\EstadoPublicacion;
 use App\Enums\TipoPublicacion;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
+use Throwable;
 
 /**
  * Un borrador del entorno de redacción: un archivo Markdown con encabezado
@@ -139,10 +141,28 @@ class Borrador
     {
         return (int) ($this->frente['hace_dias'] ?? 0);
     }
+    
+    public function fechaPublicacion(): ?CarbonImmutable
+    {
+        $declarada = trim((string) ($this->frente['fecha'] ?? ''));
 
-    /**
-     * Estimación estándar de 200 palabras por minuto, mínimo un minuto.
-     */
+        if ($declarada !== '') {
+            try {
+                return CarbonImmutable::parse($declarada);
+            } catch (Throwable $e) {
+                throw new RuntimeException(
+                    "El borrador {$this->archivo} tiene una fecha que no se entiende: {$declarada}."
+                );
+            }
+        }
+
+        if ($this->estado() === EstadoPublicacion::Publicado) {
+            return CarbonImmutable::now()->subDays($this->haceDias())->setTime(9, 0);
+        }
+
+        return null;
+    }
+
     public function tiempoLectura(): int
     {
         $declarado = (int) ($this->frente['tiempo_lectura'] ?? 0);

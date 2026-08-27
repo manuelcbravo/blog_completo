@@ -2,7 +2,6 @@
 
 namespace App\Support\Redaccion;
 
-use App\Enums\EstadoPublicacion;
 use App\Enums\TipoPublicacion;
 use App\Models\Categoria;
 use App\Models\Comentario;
@@ -70,9 +69,7 @@ class ImportadorDeBorradores
                 'resumen' => $borrador->resumen(),
                 'contenido' => $borrador->contenidoHtml(),
                 'estado' => $borrador->estado(),
-                'fecha_publicacion' => $borrador->estado() === EstadoPublicacion::Publicado
-                    ? now()->subDays($borrador->haceDias())->setTime(9, 0)
-                    : null,
+                'fecha_publicacion' => $borrador->fechaPublicacion(),
                 'tiempo_lectura' => $borrador->tiempoLectura(),
                 'importante' => $borrador->importante(),
                 'tags_seo' => $borrador->tagsSeo(),
@@ -209,12 +206,25 @@ class ImportadorDeBorradores
         return $total;
     }
 
+    /**
+     * `withTrashed` no es un adorno: una limpieza previa deja categorías
+     * borradas en suave, y el índice único de `nombre` sigue vigente sobre
+     * ellas. Sin esto, `firstOrCreate` no la encuentra por slug, intenta
+     * insertarla y revienta con una violación de unicidad que no menciona
+     * la palabra «borrada».
+     */
     private function categoria(string $nombre): Categoria
     {
-        return Categoria::query()->firstOrCreate(
+        $categoria = Categoria::query()->withTrashed()->firstOrCreate(
             ['slug' => Str::slug($nombre)],
             ['nombre' => $nombre, 'descripcion' => "Publicaciones sobre {$nombre}."],
         );
+
+        if ($categoria->trashed()) {
+            $categoria->restore();
+        }
+
+        return $categoria;
     }
 
     /**
@@ -224,10 +234,20 @@ class ImportadorDeBorradores
     private function etiquetas(array $nombres): array
     {
         return array_map(
-            fn (string $nombre): int => Etiqueta::query()->firstOrCreate(
-                ['slug' => Str::slug($nombre)],
-                ['nombre' => $nombre],
-            )->id,
+            function (string $nombre): int {
+                // Mismo motivo que en categoria(): las etiquetas huérfanas se
+                // borran en suave al limpiar, y su nombre sigue reservado.
+                $etiqueta = Etiqueta::query()->withTrashed()->firstOrCreate(
+                    ['slug' => Str::slug($nombre)],
+                    ['nombre' => $nombre],
+                );
+
+                if ($etiqueta->trashed()) {
+                    $etiqueta->restore();
+                }
+
+                return $etiqueta->id;
+            },
             $nombres,
         );
     }

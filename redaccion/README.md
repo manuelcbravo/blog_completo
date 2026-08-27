@@ -79,6 +79,7 @@ El cuerpo, en Markdown.
 | `etiquetas` | no | Lista. Se crean solas. |
 | `resumen` | no | Se muestra en listados, en el RSS y como descripción social. |
 | `meta_titulo`, `meta_descripcion`, `tags_seo` | no | SEO. Caen al título, al resumen y a las etiquetas si se omiten. |
+| `fecha` | no | Fecha fija de publicación, `AAAA-MM-DD HH:MM`. Gana sobre `hace_dias`. Es la única forma de programar a futuro. |
 | `hace_dias` | no | Antigüedad **relativa a hoy**, no una fecha fija. Ver abajo. |
 | `importante` | no | La destaca en la portada. |
 | `tiempo_lectura` | no | En minutos. Si se omite se calcula a 200 palabras por minuto. |
@@ -90,6 +91,25 @@ diciembre el blog aparenta llevar cuatro meses muerto. Con `hace_dias`, cada
 siembra reconstruye un archivo histórico coherente. El precio es que la fecha
 se mueve si vuelves a sembrar de cero, lo cual da igual mientras el contenido
 viva en estos archivos.
+
+### Programar a futuro
+
+`hace_dias` sólo cuenta hacia atrás, así que no sirve para dejar algo en cola.
+Para eso está `fecha`, con `estado: programado`:
+
+```markdown
+---
+estado: programado
+fecha: '2026-09-01 09:00'
+---
+```
+
+`blog:publicar-programadas` corre cada cinco minutos y las pasa a `publicado`
+cuando la fecha llega. Un `programado` **sin** `fecha` nunca sale, y el comando
+lo avisa con «Sin fecha, nunca saldra».
+
+Cuando `fecha` está puesta, gana sobre `hace_dias` también en las publicadas:
+es la manera de fijar una fecha que no se mueva entre siembras.
 
 **En producción no corras el seeder de cero.** Usa `php artisan blog:redaccion`,
 que actualiza sin recalcular la fecha de lo que ya estaba publicado... salvo

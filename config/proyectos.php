@@ -177,7 +177,7 @@ return [
 
                 [
                     'nombre' => 'Este sitio',
-                    'url' => 'https://laravelconmanuel.dev',
+                    'url' => 'https://laravelconmanuel.dev/login',
                     'tipo' => 'Blog técnico y portafolio, con su panel de redacción',
                     'resumen' => 'La página que estás leyendo. Sitio público, panel para escribir y publicar, newsletter y analítica de visitas — con el mismo patrón de despliegue que todo lo demás de esta lista. Es el único proyecto del que además puedes ver el código.',
 
